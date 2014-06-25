@@ -4,6 +4,29 @@ from django.db import models
 
 import datetime
 
+class District(models.Model):
+    """
+    District entity
+    """
+
+    code = models.CharField(max_length=8, primary_key=True, 
+        verbose_name=u'codice quartiere', help_text=u'codice quartiere'
+    )
+    name = models.CharField(max_length=128, unique=True, 
+        verbose_name=u'nome quartiere', help_text=u'nome quartiere'
+    )
+
+    class Meta:
+
+        db_table = "camp_districts"
+        verbose_name = "quartiere"
+        verbose_name_plural = "quartieri"
+
+    def __unicode__(self):
+        return self.name
+
+#--------------------------------------------------------------------------------
+
 class ScoutUnit(models.Model):
 
     name = models.CharField(
@@ -45,7 +68,7 @@ class Scout(models.Model):
     code = models.CharField(max_length=128, unique=True,
         verbose_name="codice censimento", help_text=u'codice censimento'
     )
-    scout_unit = models.ForeignKey(Unit)
+    scout_unit = models.ForeignKey(ScoutUnit)
 
     name = models.CharField(max_length=32, 
         verbose_name="nome", help_text=u'nome'
@@ -54,7 +77,7 @@ class Scout(models.Model):
         verbose_name="cognome", help_text=u'cognome'
     )
     birthday = models.DateField(verbose_name="data di nascita", help_text=u'data di nascita')
-    is_spalla = models.BooleanField(default=False, 
+    is_chief = models.BooleanField(default=False, 
         verbose_name=u"è un capo", help_text=u"questo è un capo scout"
     )
 
@@ -70,29 +93,6 @@ class Scout(models.Model):
     @property
     def age(self):
         return datetime.date.today().year - self.birthday.year
-
-#--------------------------------------------------------------------------------
-
-class District(models.Model):
-    """
-    District entity
-    """
-
-    code = models.CharField(max_length=8, primary_key=True, 
-        verbose_name=u'codice quartiere', help_text=u'codice quartiere'
-    )
-    name = models.CharField(max_length=128, unique=True, 
-        verbose_name=u'nome quartiere', help_text=u'nome quartiere'
-    )
-
-    class Meta:
-
-        db_table = "camp_districts"
-        verbose_name = "quartiere"
-        verbose_name_plural = "quartieri"
-
-    def __unicode__(self):
-        return self.name
 
 #--------------------------------------------------------------------------------
 
