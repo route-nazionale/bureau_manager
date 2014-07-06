@@ -1,3 +1,5 @@
+from default_settings import *
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#eh5w_tz$_e2)(hk0tm@qirunu=14m*5l%(9inlfxbgn+tf_p-'
 
