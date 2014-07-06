@@ -1,5 +1,7 @@
+#-*- coding: utf-8 -*-
+
 from django.contrib import admin
-from edda.models import Humen
+from edda.models import Humen, Chiefroles
 
 class HumenAdmin(admin.ModelAdmin):
     list_display = [
@@ -31,39 +33,43 @@ class HumenAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                'cu', 'codice_censimento', 'idgruppo', 'idunitagruppo', 'vclan_id' 
+                ('cu', 'codice_censimento', 'idgruppo', 'idunitagruppo',), 'vclan_id' 
             )
         }),
         ('Anagrafica', {
             'fields': (
-                'nome', 'cognome', 'sesso', 'data_nascita', 'eta', 'cellulare', 
-                'email', 'abitazione', 'indirizzo', 'provincia', 'cap', 'citta',
+                ('nome', 'cognome'), ('sesso', 'data_nascita'), #età non visualizzata 
+                ('cellulare', 'email'), 
+                ('abitazione', 'indirizzo', 'provincia', 'cap', 'citta'),
             )
         }),
         ('Partecipazione', {
             'fields': (
-                'ruolo_id', 'periodo_partecipazione_id', 'pagato', 'mod_pagamento_id', 
+                'ruolo_id', 'periodo_partecipazione_id', ('pagato', 'mod_pagamento_id'), 
             )
         }),
         ('Ruoli', {
             'fields': (
-                'novizio', 'scout', 'agesci', 'rs', 'capo', 'oneteam', 'extra',  
+                ('lab', 'novizio', 'scout', 'agesci', 'rs', 'capo', 'oneteam', 'extra'),  
             )
         }),
         ('Strade di coraggio', {
             'fields': (
-                'stradadicoraggio1', 'stradadicoraggio2', 'stradadicoraggio3', 'stradadicoraggio4', 'stradadicoraggio5',
+                ('stradadicoraggio1', 'stradadicoraggio2', 'stradadicoraggio3', 'stradadicoraggio4', 'stradadicoraggio5'),
             )
         }),
         ('Alimentazione', {
             'fields': (
-                'colazione', 'dieta_alimentare_id', 'intolleranze_alimentari', 'el_intolleranze_alimentari',
-                'allergie_alimentari', 'el_allergie_alimentari', 'allergie_farmaci', 'el_allergie_farmaci',
+                ('colazione', 'dieta_alimentare_id'), 
+                'intolleranze_alimentari', 'el_intolleranze_alimentari',
+                'allergie_alimentari', 'el_allergie_alimentari', 
+                'allergie_farmaci', 'el_allergie_farmaci',
             )
         }),
         ('Diversamente abili', {
             'fields': (
-                'fisiche', 'lis', 'psichiche', 'sensoriali', 'patologie', 
+                ('fisiche', 'lis', 'psichiche', 'sensoriali'),
+                'patologie', 
             )
         }),
         ('Aggiornamento', {
@@ -73,4 +79,11 @@ class HumenAdmin(admin.ModelAdmin):
         }),
     )
 
+class ChiefrolesAdmin(admin.ModelAdmin):
+    
+    list_display = [
+        'description',
+    ]
+
 admin.site.register(Humen, HumenAdmin)
+admin.site.register(Chiefroles, ChiefrolesAdmin)

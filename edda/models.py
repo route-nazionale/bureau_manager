@@ -88,7 +88,9 @@ class Humen(models.Model):
     )
     
     # Ruoli  ----------------------------
-
+    lab = models.BooleanField(default=False,
+        verbose_name='tiene un laboratorio', help_text=''
+    )
     novizio = models.BooleanField(default=False,
         verbose_name='novizio', help_text=''
     )
@@ -113,19 +115,19 @@ class Humen(models.Model):
 
     # Strade di coraggio -----------------------------------    
 
-    stradadicoraggio1 = models.IntegerField(blank=True, null=True,
+    stradadicoraggio1 = models.BooleanField(default=False,
         verbose_name='strada di coraggio 1', help_text=''
     )
-    stradadicoraggio2 = models.IntegerField(blank=True, null=True,
+    stradadicoraggio2 = models.BooleanField(default=False,
         verbose_name='strada di coraggio 2', help_text=''
     )
-    stradadicoraggio3 = models.IntegerField(blank=True, null=True,
+    stradadicoraggio3 = models.BooleanField(default=False,
         verbose_name='strada di coraggio 3', help_text=''
     )
-    stradadicoraggio4 = models.IntegerField(blank=True, null=True,
+    stradadicoraggio4 = models.BooleanField(default=False,
         verbose_name='strada di coraggio 4', help_text=''
     )
-    stradadicoraggio5 = models.IntegerField(blank=True, null=True,
+    stradadicoraggio5 = models.BooleanField(default=False,
         verbose_name='strada di coraggio 5', help_text=''
     )
     
@@ -137,37 +139,37 @@ class Humen(models.Model):
     dieta_alimentare_id = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
         verbose_name='dieta alimentare', help_text=''
     )
-    intolleranze_alimentari = models.IntegerField(blank=True, null=True,
+    intolleranze_alimentari = models.BooleanField(default=False,
         verbose_name='intolleranze alimentari', help_text=''
     )
-    el_intolleranze_alimentari = models.CharField(max_length=255, blank=True,
+    el_intolleranze_alimentari = models.TextField(max_length=255, blank=True,
         verbose_name='intolleranze alimentari', help_text=''
     )
-    allergie_alimentari = models.IntegerField(blank=True, null=True,
+    allergie_alimentari = models.BooleanField(default=False,
         verbose_name='allergie alimentari', help_text=''
     )
-    el_allergie_alimentari = models.CharField(max_length=255, blank=True,
+    el_allergie_alimentari = models.TextField(max_length=255, blank=True,
         verbose_name='allergie alimentari', help_text=''
     )
-    allergie_farmaci = models.IntegerField(blank=True, null=True,
+    allergie_farmaci = models.BooleanField(default=False,
         verbose_name='allergie farmaci', help_text=''
     )
-    el_allergie_farmaci = models.CharField(max_length=255, blank=True,
+    el_allergie_farmaci = models.TextField(max_length=255, blank=True,
         verbose_name='allergie farmaci', help_text=''
     )
 
     # Diversamente abili ---------------------------------------
 
-    fisiche = models.IntegerField(blank=True, null=True,
+    fisiche = models.BooleanField(default=False,
         verbose_name=u'disabilità fisica', help_text=''
     )
-    lis = models.IntegerField(blank=True, null=True,
+    lis = models.BooleanField(default=False,
         verbose_name='LIS', help_text=''
     )
-    psichiche = models.IntegerField(blank=True, null=True,
+    psichiche = models.BooleanField(default=False,
         verbose_name=u'disabilità psichica', help_text=''
     )
-    sensoriali = models.IntegerField(blank=True, null=True,
+    sensoriali = models.BooleanField(default=False,
         verbose_name=u'disabilità sensoriale', help_text=''
     )
     patologie = models.CharField(max_length=255, blank=True,
@@ -182,11 +184,6 @@ class Humen(models.Model):
     )
     updated_at = models.DateTimeField(blank=True, null=True,
         verbose_name='ultimo aggiornamento', help_text=''
-    )
-
-    # ???
-    lab = models.IntegerField(blank=True, null=True,
-        verbose_name='lab??', help_text=''
     )
 
     class Meta:
