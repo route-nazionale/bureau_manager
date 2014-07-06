@@ -335,7 +335,7 @@ class Periodipartecipaziones(models.Model):
         verbose_name_plural = 'periodi di partecipazione'
     
     def __unicode__(self):
-        return self.description
+        return u"%s - %s" % (self.ruolo, self.description)
 
 class RoutesOrig(models.Model):
     id = models.IntegerField(primary_key=True)  # AutoField?
@@ -398,3 +398,28 @@ class DjangoMigrations(models.Model):
     class Meta:
         managed = False
         db_table = 'django_migrations'
+
+#--------------------------------------------------------------------------------
+
+class ChiefManager(models.Manager):
+    def get_queryset(self):
+        return super(ChiefManager, self).get_queryset().filter(capo=True)
+
+class RSManager(models.Manager):
+    def get_queryset(self):
+        return super(RSManager, self).get_queryset().filter(rs=True)
+
+
+class ChiefHumen(Humen):
+
+    objects = ChiefManager()
+
+    class Meta:
+        proxy = True
+
+class RSHumen(Humen):
+
+    objects = RSManager()
+
+    class Meta:
+        proxy = True

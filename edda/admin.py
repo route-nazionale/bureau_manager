@@ -1,9 +1,12 @@
 #-*- coding: utf-8 -*-
 
 from django.contrib import admin
-from edda.models import Humen, Chiefroles
+from edda.models import Humen, Chiefroles, Periodipartecipaziones
+from edda.models import RSHumen, ChiefHumen
 
-class HumenAdmin(admin.ModelAdmin):
+import copy
+
+class BaseHumenAdmin(admin.ModelAdmin):
     list_display = [
         '__unicode__',
         'cu',
@@ -11,8 +14,6 @@ class HumenAdmin(admin.ModelAdmin):
         'cognome',
         'vclan_id',
         'ruolo_id',
-        'rs',
-        'capo',
     ]
 
     search_fields = [
@@ -24,8 +25,6 @@ class HumenAdmin(admin.ModelAdmin):
     ]
 
     list_filter = [
-        'rs',
-        'capo',
         'ruolo_id__description',
         'vclan_id__nome',
     ]
@@ -33,7 +32,8 @@ class HumenAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('cu', 'codice_censimento', 'idgruppo', 'idunitagruppo',), 'vclan_id' 
+                ('vclan_id', 'codice_censimento'),
+                ('cu', 'idgruppo', 'idunitagruppo',),  
             )
         }),
         ('Anagrafica', {
@@ -79,11 +79,30 @@ class HumenAdmin(admin.ModelAdmin):
         }),
     )
 
+class HumenAdmin(BaseHumenAdmin):
+    list_display = copy.copy(BaseHumenAdmin.list_display) + ['rs', 'capo']
+    list_filter = copy.copy(BaseHumenAdmin.list_filter) + ['rs', 'capo']
+
+class RSAdmin(BaseHumenAdmin):
+    pass
+
+class ChiefAdmin(BaseHumenAdmin):
+    pass
+
 class ChiefrolesAdmin(admin.ModelAdmin):
     
-    list_display = [
+    list_display = (
         'description',
-    ]
+    )
+
+class PeriodipartecipazionesAdmin(admin.ModelAdmin):
+    list_display = (
+        '__unicode__',
+    )
+    
 
 admin.site.register(Humen, HumenAdmin)
+admin.site.register(RSHumen, RSAdmin)
+admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Chiefroles, ChiefrolesAdmin)
+admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)
