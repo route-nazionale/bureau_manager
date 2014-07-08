@@ -14,7 +14,6 @@ from __future__ import unicode_literals
 from django.db import models
 
 class Humen(models.Model):
-    #id = models.IntegerField(primary_key=True)  # AutoField?
 
     cu = models.CharField(max_length=255, blank=True,
         verbose_name='codice unico', help_text=''
@@ -29,7 +28,7 @@ class Humen(models.Model):
         verbose_name=u'id unità gruppo', help_text=''
     )
     
-    vclan_id = models.ForeignKey('Vclans', db_column='vclan_id',
+    vclan = models.ForeignKey('Vclans', db_column='vclan_id',
         verbose_name='clan', help_text=''
     )
     
@@ -74,10 +73,10 @@ class Humen(models.Model):
    
     # Partecipazione -------------------------------
  
-    ruolo_id = models.ForeignKey('Chiefroles', db_column='ruolo_id',
+    ruolo = models.ForeignKey('Chiefroles', db_column='ruolo_id',
         verbose_name='ruolo', help_text=''
     )
-    periodo_partecipazione_id = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
+    periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text=''
     )
     pagato = models.BooleanField(default=False,
@@ -89,7 +88,7 @@ class Humen(models.Model):
     
     # Ruoli  ----------------------------
     lab = models.BooleanField(default=False,
-        verbose_name='tiene un laboratorio', help_text=''
+        verbose_name='lab.', help_text=''
     )
     novizio = models.BooleanField(default=False,
         verbose_name='novizio', help_text=''
@@ -107,7 +106,7 @@ class Humen(models.Model):
         verbose_name='capo', help_text=''
     )
     oneteam = models.BooleanField(default=False,
-        verbose_name='membro OneTeam', help_text=''
+        verbose_name='OneTeam', help_text=''
     )
     extra = models.BooleanField(default=False,
         verbose_name='esterno', help_text=''
@@ -136,7 +135,7 @@ class Humen(models.Model):
     colazione = models.ForeignKey('Colaziones', db_column='colazione',
         verbose_name='tipo di colazione', help_text=''
     )
-    dieta_alimentare_id = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
+    dieta_alimentare = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
         verbose_name='dieta alimentare', help_text=''
     )
     intolleranze_alimentari = models.BooleanField(default=False,
@@ -196,7 +195,6 @@ class Humen(models.Model):
         return "%s - %s %s" % (self.cu, self.nome, self.cognome)
 
 class Vclans(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     idvclan = models.CharField(max_length=255, blank=True)
     idgruppo = models.CharField(max_length=255, blank=True)
     idunitagruppo = models.CharField(max_length=255, blank=True)
@@ -216,9 +214,8 @@ class Vclans(models.Model):
         return self.nome
 
 class Chiefroles(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     kkey = models.IntegerField(blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, blank=True, verbose_name='ruolo')
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
 
@@ -232,7 +229,6 @@ class Chiefroles(models.Model):
         return self.description
 
 class Colaziones(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     kkey = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(blank=True, null=True)
@@ -248,7 +244,6 @@ class Colaziones(models.Model):
         return self.name
 
 class Contradas(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     numero = models.IntegerField(blank=True, null=True)
     district_id = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True)
@@ -268,7 +263,6 @@ class Contradas(models.Model):
         return self.name
 
 class Dietabases(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     kkey = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(blank=True, null=True)
@@ -284,7 +278,6 @@ class Dietabases(models.Model):
         return self.name
 
 class Districts(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     name = models.CharField(max_length=255, blank=True)
     color = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(blank=True, null=True)
@@ -303,9 +296,8 @@ class Districts(models.Model):
         return self.name
 
 class Gemellaggios(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
-    route_id = models.IntegerField(blank=True, null=True)
-    vclan_id = models.IntegerField(blank=True, null=True)
+    route = models.ForeignKey('RoutesTest', db_column='route_id')
+    vclan = models.ForeignKey('Vclans', db_column='vclan_id')
     ospitante = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
@@ -317,7 +309,6 @@ class Gemellaggios(models.Model):
         verbose_name_plural = 'gemellaggi'
 
 class Periodipartecipaziones(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     kkey = models.IntegerField(blank=True, null=True)
     description = models.CharField(max_length=255, blank=True)
     from_day = models.IntegerField(blank=True, null=True)
@@ -338,7 +329,6 @@ class Periodipartecipaziones(models.Model):
         return u"%s - %s" % (self.ruolo, self.description)
 
 class RoutesOrig(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     name = models.CharField(max_length=255, blank=True)
     numero = models.IntegerField(blank=True, null=True)
     area = models.CharField(max_length=255, blank=True)
@@ -353,7 +343,6 @@ class RoutesOrig(models.Model):
         db_table = 'routes_orig'
 
 class RoutesTest(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     name = models.CharField(max_length=255, blank=True)
     numero = models.IntegerField(blank=True, null=True)
     area = models.CharField(max_length=255, blank=True)
@@ -366,9 +355,13 @@ class RoutesTest(models.Model):
     class Meta:
         managed = False
         db_table = 'routes_test'
+        verbose_name = 'Route'
+        verbose_name_plural = 'Route'
+
+    def __unicode__(self):
+        return self.name
 
 class Topics(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
     kkey = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(blank=True, null=True)
