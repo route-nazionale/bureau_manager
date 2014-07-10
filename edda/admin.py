@@ -17,8 +17,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'cu',
         'nome',
         'cognome',
-        'rs',
-        'capo',
         'oneteam',
         'lab',
         'novizio',
@@ -37,6 +35,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     list_filter = [
         'ruolo__description',
+        'vclan__nome',
     ]
 
     list_per_page = 100
@@ -102,7 +101,8 @@ class HumenAdmin(BaseHumenAdmin):
     list_filter = copy.copy(BaseHumenAdmin.list_filter) + ['rs', 'capo']
 
 class RSAdmin(BaseHumenAdmin):
-    pass
+
+    list_filter = ( 'agesci', 'vclan')
 
 class ChiefAdmin(BaseHumenAdmin):
     pass

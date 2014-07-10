@@ -16,32 +16,32 @@ from django.db import models
 class Humen(models.Model):
 
     cu = models.CharField(max_length=255, blank=True,
-        verbose_name='codice unico', help_text=''
+        verbose_name='codice unico', help_text='', null=True
     )
     codice_censimento = models.IntegerField(blank=True, null=True,
         verbose_name='codice censimento', help_text=''
     )
     idgruppo = models.CharField(max_length=255, blank=True,
-        verbose_name='id gruppo', help_text=''
+        verbose_name='id gruppo', help_text='', null=True
     )
     idunitagruppo = models.CharField(max_length=255, blank=True,
-        verbose_name=u'id unità gruppo', help_text=''
+        verbose_name=u'id unità gruppo', help_text='', null=True
     )
     
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
-        verbose_name='clan', help_text=''
+        verbose_name='clan', help_text='', null=True
     )
     
     # Anagrafiche --------------------------------------
 
     nome = models.CharField(max_length=255, blank=True,
-        verbose_name='nome', help_text=''
+        verbose_name='nome', help_text='', null=True
     )
     cognome = models.CharField(max_length=255, blank=True,
-        verbose_name='cognome', help_text=''
+        verbose_name='cognome', help_text='', null=True
     )
     sesso = models.CharField(max_length=255, blank=True,
-        verbose_name='sesso', help_text=''
+        verbose_name='sesso', help_text='', null=True
     )
     data_nascita = models.DateField(blank=True, null=True,
         verbose_name='data di nascita', help_text=''
@@ -50,36 +50,36 @@ class Humen(models.Model):
         verbose_name=u'età', help_text=''
     )
     cellulare = models.CharField(max_length=255, blank=True,
-        verbose_name='cellulare', help_text=''
+        verbose_name='cellulare', help_text='', null=True
     )
     email = models.EmailField(max_length=255, blank=True,
-        verbose_name='email', help_text=''
+        verbose_name='email', help_text='', null=True
     )
     abitazione = models.CharField(max_length=255, blank=True,
-        verbose_name='abitazione', help_text=''
+        verbose_name='abitazione', help_text='', null=True
     )
     indirizzo = models.CharField(max_length=255, blank=True,
-        verbose_name='indirizzo', help_text=''
+        verbose_name='indirizzo', help_text='', null=True
     )
     provincia = models.CharField(max_length=255, blank=True,
-        verbose_name='provincia', help_text=''
+        verbose_name='provincia', help_text='', null=True
     )
     cap = models.CharField(max_length=255, blank=True,
-        verbose_name='CAP', help_text=''
+        verbose_name='CAP', help_text='', null=True
     )
     citta = models.CharField(max_length=255, blank=True,
-        verbose_name='citta', help_text=''
+        verbose_name='citta', help_text='', null=True
     )
    
     # Partecipazione -------------------------------
  
     ruolo = models.ForeignKey('Chiefroles', db_column='ruolo_id',
-        verbose_name='ruolo', help_text=''
+        verbose_name='ruolo', help_text='', null=True
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
-        verbose_name='periodo di partecipazione', help_text=''
+        verbose_name='periodo di partecipazione', help_text='', null=True
     )
-    pagato = models.BooleanField(default=False,
+    pagato = models.NullBooleanField(default=False,
         verbose_name='pagato', help_text=''
     )
     mod_pagamento_id = models.IntegerField(blank=True, null=True,
@@ -87,92 +87,92 @@ class Humen(models.Model):
     )
     
     # Ruoli  ----------------------------
-    lab = models.BooleanField(default=False,
+    lab = models.NullBooleanField(default=False,
         verbose_name='lab.', help_text=''
     )
-    novizio = models.BooleanField(default=False,
+    novizio = models.NullBooleanField(default=False,
         verbose_name='novizio', help_text=''
     )
-    scout = models.BooleanField(default=True,
+    scout = models.NullBooleanField(default=True,
         verbose_name='scout', help_text=''
     )
-    agesci = models.BooleanField(default=True,
+    agesci = models.NullBooleanField(default=True,
         verbose_name='AGESCI', help_text=''
     )
-    rs = models.BooleanField(default=True,
+    rs = models.NullBooleanField(default=True,
         verbose_name='R/S', help_text=''
     )
-    capo = models.BooleanField(default=True,
+    capo = models.NullBooleanField(default=True,
         verbose_name='capo', help_text=''
     )
-    oneteam = models.BooleanField(default=False,
+    oneteam = models.NullBooleanField(default=False,
         verbose_name='OneTeam', help_text=''
     )
-    extra = models.BooleanField(default=False,
+    extra = models.NullBooleanField(default=False,
         verbose_name='esterno', help_text=''
     )
 
     # Strade di coraggio -----------------------------------    
 
-    stradadicoraggio1 = models.BooleanField(default=False,
+    stradadicoraggio1 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 1', help_text=''
     )
-    stradadicoraggio2 = models.BooleanField(default=False,
+    stradadicoraggio2 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 2', help_text=''
     )
-    stradadicoraggio3 = models.BooleanField(default=False,
+    stradadicoraggio3 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 3', help_text=''
     )
-    stradadicoraggio4 = models.BooleanField(default=False,
+    stradadicoraggio4 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 4', help_text=''
     )
-    stradadicoraggio5 = models.BooleanField(default=False,
+    stradadicoraggio5 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 5', help_text=''
     )
     
     # Alimentazione --------------------------------------------
 
     colazione = models.ForeignKey('Colaziones', db_column='colazione',
-        verbose_name='tipo di colazione', help_text=''
+        verbose_name='tipo di colazione', help_text='', null=True
     )
     dieta_alimentare = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
-        verbose_name='dieta alimentare', help_text=''
+        verbose_name='dieta alimentare', help_text='', null=True
     )
-    intolleranze_alimentari = models.BooleanField(default=False,
+    intolleranze_alimentari = models.NullBooleanField(default=False,
         verbose_name='intolleranze alimentari', help_text=''
     )
     el_intolleranze_alimentari = models.TextField(max_length=255, blank=True,
-        verbose_name='intolleranze alimentari', help_text=''
+        verbose_name='intolleranze alimentari', help_text='', null=True
     )
-    allergie_alimentari = models.BooleanField(default=False,
+    allergie_alimentari = models.NullBooleanField(default=False,
         verbose_name='allergie alimentari', help_text=''
     )
     el_allergie_alimentari = models.TextField(max_length=255, blank=True,
-        verbose_name='allergie alimentari', help_text=''
+        verbose_name='allergie alimentari', help_text='', null=True
     )
-    allergie_farmaci = models.BooleanField(default=False,
+    allergie_farmaci = models.NullBooleanField(default=False,
         verbose_name='allergie farmaci', help_text=''
     )
     el_allergie_farmaci = models.TextField(max_length=255, blank=True,
-        verbose_name='allergie farmaci', help_text=''
+        verbose_name='allergie farmaci', help_text='', null=True
     )
 
     # Diversamente abili ---------------------------------------
 
-    fisiche = models.BooleanField(default=False,
+    fisiche = models.NullBooleanField(default=False,
         verbose_name=u'disabilità fisica', help_text=''
     )
-    lis = models.BooleanField(default=False,
+    lis = models.NullBooleanField(default=False,
         verbose_name='LIS', help_text=''
     )
-    psichiche = models.BooleanField(default=False,
+    psichiche = models.NullBooleanField(default=False,
         verbose_name=u'disabilità psichica', help_text=''
     )
-    sensoriali = models.BooleanField(default=False,
+    sensoriali = models.NullBooleanField(default=False,
         verbose_name=u'disabilità sensoriale', help_text=''
     )
     patologie = models.CharField(max_length=255, blank=True,
-        verbose_name=u'patologie', help_text=''
+        verbose_name=u'patologie', help_text='', null=True
     )
 
 
@@ -409,6 +409,8 @@ class ChiefHumen(Humen):
 
     class Meta:
         proxy = True
+        verbose_name = 'capo'
+        verbose_name_plural = 'capi'
 
 class RSHumen(Humen):
 
@@ -416,3 +418,5 @@ class RSHumen(Humen):
 
     class Meta:
         proxy = True
+        verbose_name = 'RS'
+        verbose_name_plural = 'RS'
