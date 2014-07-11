@@ -74,7 +74,7 @@ class Humen(models.Model):
     # Partecipazione -------------------------------
  
     ruolo = models.ForeignKey('Chiefroles', db_column='ruolo_id',
-        verbose_name='ruolo', help_text='', null=True
+        verbose_name='ruolo', help_text='', null=True, blank=True
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text='', null=True
@@ -179,10 +179,10 @@ class Humen(models.Model):
     # Date di creazione ed aggiornamento
 
     created_at = models.DateTimeField(blank=True, null=True,
-        verbose_name='data di creazione', help_text=''
+        verbose_name='data di creazione', help_text='', auto_now_add=True
     )
     updated_at = models.DateTimeField(blank=True, null=True,
-        verbose_name='ultimo aggiornamento', help_text=''
+        verbose_name='ultimo aggiornamento', help_text='', auto_now=True
     )
 
     class Meta:
@@ -193,6 +193,11 @@ class Humen(models.Model):
 
     def __unicode__(self):
         return "%s - %s %s" % (self.cu, self.nome, self.cognome)
+
+    def save(self, *args, **kw):
+
+        self.allergie_farmaci = bool(self.el_allergie_farmaci)
+        super(Humen, self).save(*args, **kw)
 
 class Vclans(models.Model):
     idvclan = models.CharField(max_length=255, blank=True)

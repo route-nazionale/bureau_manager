@@ -5,11 +5,29 @@ from edda.models import Humen, Chiefroles, Periodipartecipaziones
 from edda.models import RSHumen, ChiefHumen, RoutesTest
 
 from django.http import HttpResponseRedirect
-
+from django import forms
 
 import copy
 
+class BaseHumenForm(forms.ModelForm):
+
+    patologie = forms.CharField(widget=forms.Textarea(attrs={'class':'vLargeTextField'}), required=False)
+
+    def clean(self):
+
+        cleaned_data = super(BaseHumenForm, self).clean()
+        cleaned_data['el_allergie_farmaci'] = cleaned_data['el_allergie_farmaci'].strip()
+        return cleaned_data
+
+
+    class Meta:
+        model = Humen
+    
+
 class BaseHumenAdmin(admin.ModelAdmin):
+
+    form = BaseHumenForm
+
     list_display = [
         '__unicode__',
         'ruolo',
@@ -35,10 +53,10 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     list_filter = [
         'ruolo__description',
-        'vclan__nome',
+        'vclan',
     ]
 
-    list_per_page = 100
+    list_per_page = 10
 
     fieldsets = (
         (None, {
@@ -74,27 +92,30 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 ('colazione', 'dieta_alimentare'), 
                 'intolleranze_alimentari', 'el_intolleranze_alimentari',
                 'allergie_alimentari', 'el_allergie_alimentari', 
-                'allergie_farmaci', 'el_allergie_farmaci',
+                'el_allergie_farmaci',
             )
         }),
         ('Diversamente abili', {
             'fields': (
                 ('fisiche', 'lis', 'psichiche', 'sensoriali'),
                 'patologie', 
-            )
-        }),
-        ('Aggiornamento', {
-            'fields': (
-                'created_at', 'updated_at', 
-            )
+            ),
+            #'classes' : ('wide',),
         }),
     )
 
     actions = ['add_humen']
+    change_list_template = "admin/change_list_person.html"
 
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
     add_humen.short_description = 'Aggiungi Persona'
+
+    class Media:
+        css = {
+            "all": ("my_styles.css",)
+        }
+        js = ("some_admin_code.js",)
 
 class HumenAdmin(BaseHumenAdmin):
     list_display = copy.copy(BaseHumenAdmin.list_display) + ['rs', 'capo']
@@ -124,8 +145,8 @@ class RoutesTestAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(Humen, BaseHumenAdmin)
-admin.site.register(RSHumen, RSAdmin)
-admin.site.register(ChiefHumen, ChiefAdmin)
+#admin.site.register(RSHumen, RSAdmin)
+#admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Chiefroles, ChiefrolesAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)
 admin.site.register(RoutesTest, RoutesTestAdmin)
