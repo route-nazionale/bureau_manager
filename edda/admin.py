@@ -18,12 +18,18 @@ class BaseHumenForm(forms.ModelForm):
     codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False)
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
-    CLASSI = (('RS','RS'), ('CA','Capo'),('EX','Extra'), ('LA','Lab'), ('OT', 'Oneteam'))
+    CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
     classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
 
     novizio = forms.BooleanField(required=False)
     scout = forms.BooleanField(required=False)
     agesci = forms.BooleanField(required=False,label="AGESCI")
+
+    stradadicoraggio1 = forms.BooleanField(required=False, label="Il coraggio di amare (1)")
+    stradadicoraggio2 = forms.BooleanField(required=False, label="Il coraggio di farsi ultimi (2)")
+    stradadicoraggio3 = forms.BooleanField(required=False, label="Il coraggio di essere chiesa (3)")
+    stradadicoraggio4 = forms.BooleanField(required=False, label="Il coraggio di essere cittadini (4)")
+    stradadicoraggio5 = forms.BooleanField(required=False, label="Il coraggio di liberare il futuro (5)")
 
     def __init__(self, *args, **kw):
 
@@ -33,7 +39,7 @@ class BaseHumenForm(forms.ModelForm):
         if kw.has_key('instance'):
             disable_field(self.fields['codice_censimento'])
             instance = kw['instance']
-            classe = 'OT'
+
             if instance.rs:
                 classe = 'RS'
             elif instance.capo:
@@ -44,6 +50,9 @@ class BaseHumenForm(forms.ModelForm):
                 classe = 'EX'
             elif instance.oneteam:
                 classe = 'OT'
+            else: #default
+                classe = 'OT'
+
             self.fields['classe_presenza'].initial = classe
 
     def clean(self):
@@ -56,8 +65,8 @@ class BaseHumenForm(forms.ModelForm):
         return cleaned_data
 
 
-    class Meta:
-        model = Humen
+    #class Meta:
+    #    model = Humen
     
 
 class BaseHumenAdmin(admin.ModelAdmin):
@@ -72,12 +81,10 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'cu',
         'nome',
         'cognome',
-        'oneteam',
-        'lab',
+        'my_class',
         'novizio',
         'scout',
         'agesci',
-        'extra',
     ]
 
     search_fields = [
@@ -99,6 +106,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('vclan', 'codice_censimento'),
+                ('scout', 'agesci', 'classe_presenza', 'novizio'),  
                 ('cu',),  
             )
         }),
@@ -112,11 +120,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
         ('Partecipazione', {
             'fields': (
                 'ruolo', 'periodo_partecipazione', ('pagato'), 
-            )
-        }),
-        ('Ruoli', {
-            'fields': (
-                ('classe_presenza', 'scout', 'agesci', 'novizio'),  
             )
         }),
         ('Strade di coraggio', {
@@ -141,12 +144,32 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
     )
 
-    actions = ['add_humen']
+    #actions = ['add_humen']
     change_list_template = "admin/change_list_person.html"
+    actions_on_bottom = True
+    actions_on_top = True
 
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
     add_humen.short_description = 'Aggiungi Persona'
+
+    def my_class(self, obj):
+
+        if obj.rs:
+            classe = 'RS'
+        elif obj.capo:
+            classe = 'Capo'
+        elif obj.lab:
+            classe = 'Oneteam'
+        elif obj.extra:
+            classe = 'Quadro'
+        elif obj.oneteam:
+            classe = 'Laboratori'
+        else: #default
+            classe = '(Nessuna)'
+
+        return classe
+    my_class.short_description = 'classe'
 
     def save_model(self, request, obj, form, changed):
         

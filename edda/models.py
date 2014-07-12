@@ -34,7 +34,7 @@ class Humen(models.Model):
     )
     
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
-        verbose_name='clan', help_text='', null=True
+        verbose_name='clan', help_text='', null=True, blank=True
     )
     
     # Anagrafiche --------------------------------------
@@ -138,10 +138,10 @@ class Humen(models.Model):
     # Alimentazione --------------------------------------------
 
     colazione = models.ForeignKey('Colaziones', db_column='colazione',
-        verbose_name='tipo di colazione', help_text='', null=True
+        verbose_name='tipo di colazione', help_text='', null=True, blank=True
     )
     dieta_alimentare = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
-        verbose_name='dieta alimentare', help_text='', null=True
+        verbose_name='dieta alimentare', help_text='', null=True, blank=True
     )
     intolleranze_alimentari = models.NullBooleanField(default=False,
         verbose_name='intolleranze alimentari', help_text=''
@@ -213,8 +213,12 @@ class Humen(models.Model):
             old_me = Humen.objects.get(pk=self.pk)
             # check to update idgruppo and idunitagruppo
             if self.vclan != old_me.vclan:
-                self.idunitagruppo = self.vclan.idunitagruppo
-                self.idgruppo = self.vclan.idgruppo
+                if self.vclan:
+                    self.idunitagruppo = self.vclan.idunitagruppo
+                    self.idgruppo = self.vclan.idgruppo
+                else:
+                    self.idunitagruppo = ''
+                    self.idgruppo = ''
 
                 #WARNING: non cambiamo il codice univoco...
 
@@ -255,6 +259,7 @@ class Humen(models.Model):
         return compute_age(self.data_nascita) < settings.YOUNG_AGE
 
 class Vclans(models.Model):
+
     idvclan = models.CharField(max_length=255, blank=True)
     idgruppo = models.CharField(max_length=255, blank=True)
     idunitagruppo = models.CharField(max_length=255, blank=True)
@@ -271,7 +276,7 @@ class Vclans(models.Model):
         verbose_name_plural = 'clan'
 
     def __unicode__(self):
-        return self.nome
+        return u"%s (%s)" % (self.nome, self.idunitagruppo)
 
 class Chiefroles(models.Model):
     kkey = models.IntegerField(blank=True, null=True)
