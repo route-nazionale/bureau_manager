@@ -145,6 +145,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
     )
 
     #actions = ['add_humen']
+    actions = ['set_as_arrived']
+
     change_list_template = "admin/change_list_person.html"
     actions_on_bottom = True
     actions_on_top = True
@@ -152,6 +154,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
     add_humen.short_description = 'Aggiungi Persona'
+
+    def set_as_arrived(self, request, queryset):
+        # TODO
+        self.message_user(request, 'Benvenuti: %s' % " ".join(map(unicode, queryset)))
+        return None
+    set_as_arrived.short_description = 'Segna come arrivati'
 
     def my_class(self, obj):
 
