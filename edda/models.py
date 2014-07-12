@@ -138,10 +138,10 @@ class Humen(models.Model):
     # Alimentazione --------------------------------------------
 
     colazione = models.ForeignKey('Colaziones', db_column='colazione',
-        verbose_name='tipo di colazione', help_text='', null=True
+        verbose_name='tipo di colazione', help_text='', null=True, blank=True
     )
     dieta_alimentare = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
-        verbose_name='dieta alimentare', help_text='', null=True
+        verbose_name='dieta alimentare', help_text='', null=True, blank=True
     )
     intolleranze_alimentari = models.NullBooleanField(default=False,
         verbose_name='intolleranze alimentari', help_text=''
