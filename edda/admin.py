@@ -21,7 +21,6 @@ class BaseHumenForm(forms.ModelForm):
     CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
     classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
 
-    novizio = forms.BooleanField(required=False)
     scout = forms.BooleanField(required=False)
     agesci = forms.BooleanField(required=False,label="AGESCI")
 
@@ -82,7 +81,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'nome',
         'cognome',
         'my_class',
-        'novizio',
         'scout',
         'agesci',
     ]
@@ -106,7 +104,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('vclan', 'codice_censimento'),
-                ('scout', 'agesci', 'classe_presenza', 'novizio'),  
+                ('scout', 'agesci', 'classe_presenza'),  
                 ('cu',),  
             )
         }),

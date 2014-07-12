@@ -95,8 +95,10 @@ class Humen(models.Model):
     lab = models.NullBooleanField(default=False,
         verbose_name='lab.', help_text=''
     )
+
+    # Deprecated
     novizio = models.NullBooleanField(default=False,
-        verbose_name='novizio', help_text=''
+        verbose_name='novizio', help_text='DEPRECATO'
     )
     scout = models.NullBooleanField(default=True,
         verbose_name='scout', help_text=''
