@@ -25,6 +25,12 @@ class BaseHumenForm(forms.ModelForm):
     scout = forms.BooleanField(required=False)
     agesci = forms.BooleanField(required=False,label="AGESCI")
 
+    stradadicoraggio1 = forms.BooleanField(required=False, label="Il coraggio di amare (1)")
+    stradadicoraggio2 = forms.BooleanField(required=False, label="Il coraggio di farsi ultimi (2)")
+    stradadicoraggio3 = forms.BooleanField(required=False, label="Il coraggio di essere chiesa (3)")
+    stradadicoraggio4 = forms.BooleanField(required=False, label="Il coraggio di essere cittadini (4)")
+    stradadicoraggio5 = forms.BooleanField(required=False, label="Il coraggio di liberare il futuro (5)")
+
     def __init__(self, *args, **kw):
 
         super(BaseHumenForm, self).__init__(*args, **kw)
@@ -56,8 +62,8 @@ class BaseHumenForm(forms.ModelForm):
         return cleaned_data
 
 
-    class Meta:
-        model = Humen
+    #class Meta:
+    #    model = Humen
     
 
 class BaseHumenAdmin(admin.ModelAdmin):
