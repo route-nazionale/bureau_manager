@@ -143,8 +143,10 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
     )
 
-    actions = ['add_humen']
+    #actions = ['add_humen']
     change_list_template = "admin/change_list_person.html"
+    actions_on_bottom = True
+    actions_on_top = True
 
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
