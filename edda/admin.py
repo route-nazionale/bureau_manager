@@ -19,7 +19,7 @@ class BaseHumenForm(forms.ModelForm):
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
     CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
-    classe_presenza = forms.ChoiceField(widget=forms.Select, choices=CLASSI)
+    classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
 
     novizio = forms.BooleanField(required=False)
     scout = forms.BooleanField(required=False)
@@ -39,7 +39,7 @@ class BaseHumenForm(forms.ModelForm):
         if kw.has_key('instance'):
             disable_field(self.fields['codice_censimento'])
             instance = kw['instance']
-            classe = 'OT'
+
             if instance.rs:
                 classe = 'RS'
             elif instance.capo:
@@ -50,6 +50,9 @@ class BaseHumenForm(forms.ModelForm):
                 classe = 'EX'
             elif instance.oneteam:
                 classe = 'OT'
+            else: #default
+                classe = 'OT'
+
             self.fields['classe_presenza'].initial = classe
 
     def clean(self):
@@ -78,12 +81,10 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'cu',
         'nome',
         'cognome',
-        'oneteam',
-        'lab',
+        'my_class',
         'novizio',
         'scout',
         'agesci',
-        'extra',
     ]
 
     search_fields = [
@@ -151,6 +152,24 @@ class BaseHumenAdmin(admin.ModelAdmin):
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
     add_humen.short_description = 'Aggiungi Persona'
+
+    def my_class(self, obj):
+
+        if obj.rs:
+            classe = 'RS'
+        elif obj.capo:
+            classe = 'Capo'
+        elif obj.lab:
+            classe = 'Oneteam'
+        elif obj.extra:
+            classe = 'Quadro'
+        elif obj.oneteam:
+            classe = 'Laboratori'
+        else: #default
+            classe = '(Nessuna)'
+
+        return classe
+    my_class.short_description = 'classe'
 
     def save_model(self, request, obj, form, changed):
         
