@@ -34,10 +34,10 @@ class Humen(models.Model):
         verbose_name='codice censimento', help_text=''
     )
     idgruppo = models.CharField(max_length=255, blank=True,
-        verbose_name='id gruppo', help_text='', null=True
+        verbose_name='ID gruppo', help_text='', null=True
     )
     idunitagruppo = models.CharField(max_length=255, blank=True,
-        verbose_name=u'id unità gruppo', help_text='', null=True
+        verbose_name=u'ID unità gruppo', help_text='', null=True
     )
     
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
@@ -279,8 +279,8 @@ class Humen(models.Model):
 class Vclans(models.Model):
 
     idvclan = models.CharField(max_length=255, blank=True)
-    idgruppo = models.CharField(max_length=255, blank=True)
-    idunitagruppo = models.CharField(max_length=255, blank=True)
+    idgruppo = models.CharField(verbose_name="ID gruppo", max_length=255, blank=True)
+    idunitagruppo = models.CharField(verbose_name="ID unità gruppo", max_length=255, blank=True)
     ordinale = models.CharField(max_length=255, blank=True)
     nome = models.CharField(max_length=255, blank=True)
     regione = models.CharField(max_length=255, blank=True)

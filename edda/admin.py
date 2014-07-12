@@ -28,6 +28,24 @@ def only_one_element_allowed(func):
 
     return my_fun
 
+class ReadOnlyForm(forms.ModelForm):
+
+    def __init__(self, *args, **kw):
+
+        super(ReadOnlyForm, self).__init__(*args, **kw)
+        for v in self.fields.values():
+            disable_field(v)
+        
+    def clean(self):
+
+        cleaned_data = super(ReadOnlyForm, self).clean()
+        if self.instance:
+            for k,v in self.fields.items():
+                cleaned_data[k] = getattr(self.instance, k)
+        return cleaned_data
+    
+#--------------------------------------------------------------------------------
+
 
 class BaseHumenForm(forms.ModelForm):
 
@@ -75,6 +93,9 @@ class BaseHumenForm(forms.ModelForm):
 
         cleaned_data = super(BaseHumenForm, self).clean()
         cleaned_data['el_allergie_farmaci'] = cleaned_data['el_allergie_farmaci'].strip()
+        cleaned_data['el_allergie_alimentari'] = cleaned_data['el_allergie_alimentari'].strip()
+        cleaned_data['el_intolleranze_alimentari'] = cleaned_data['el_intolleranze_alimentari'].strip()
+        cleaned_data['patologie'] = cleaned_data['patologie'].strip()
         if self.instance:
             cleaned_data['codice_censimento'] = self.instance.codice_censimento
             cleaned_data['cu'] = self.instance.cu
@@ -165,7 +186,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'imposta_ritirati',
     ]
 
-    change_list_template = "admin/change_list_person.html"
+    change_list_template = "admin/change_list_pagination_on_top.html"
     actions_on_bottom = True
     actions_on_top = True
 
@@ -272,12 +293,19 @@ class VclansAdmin(admin.ModelAdmin):
     inlines = [
         HumenInline,
     ]
+    form = ReadOnlyForm
+
     actions = [
         'arrivati_al_campo', 
         'non_arrivati_al_campo',
         'arrivati_al_quartiere',
         'non_arrivati_al_quartiere',
     ]
+
+    change_list_template = "admin/change_list_pagination_on_top.html"
+    actions_on_bottom = True
+    actions_on_top = True
+    save_on_top = True
 
     list_display = (
         '__unicode__', 'nome', 'idunitagruppo', 'idgruppo'
@@ -286,8 +314,8 @@ class VclansAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
-                ('nome', 'idunitagruppo', 'idgruppo'),
-                ('regione',)
+                ('nome', 'idunitagruppo', 'idgruppo',
+                'regione',)
             )
         }),
     )
