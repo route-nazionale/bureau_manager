@@ -18,8 +18,8 @@ class BaseHumenForm(forms.ModelForm):
     codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False)
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
-    CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadri'), ('LA','Laboratori'))
-    classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
+    CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
+    classe_presenza = forms.ChoiceField(widget=forms.Select, choices=CLASSI)
 
     novizio = forms.BooleanField(required=False)
     scout = forms.BooleanField(required=False)
