@@ -250,6 +250,7 @@ class Humen(models.Model):
         return (datetime.datetime.now().year - self.data_nascita.year) < settings.YOUNG_AGE
 
 class Vclans(models.Model):
+
     idvclan = models.CharField(max_length=255, blank=True)
     idgruppo = models.CharField(max_length=255, blank=True)
     idunitagruppo = models.CharField(max_length=255, blank=True)
@@ -266,7 +267,7 @@ class Vclans(models.Model):
         verbose_name_plural = 'clan'
 
     def __unicode__(self):
-        return self.nome
+        return u"%s (%s)" % (self.nome, self.idunitagruppo)
 
 class Chiefroles(models.Model):
     kkey = models.IntegerField(blank=True, null=True)
