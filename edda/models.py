@@ -196,6 +196,8 @@ class Humen(models.Model):
 
     def save(self, *args, **kw):
 
+        self.intolleranze_alimentari = bool(self.el_intolleranze_alimentari)
+        self.allergie_alimentari = bool(self.el_allergie_alimentari)
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
         super(Humen, self).save(*args, **kw)
 

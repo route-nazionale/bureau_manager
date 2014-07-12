@@ -90,8 +90,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         ('Alimentazione', {
             'fields': (
                 ('colazione', 'dieta_alimentare'), 
-                'intolleranze_alimentari', 'el_intolleranze_alimentari',
-                'allergie_alimentari', 'el_allergie_alimentari', 
+                'el_intolleranze_alimentari',
+                'el_allergie_alimentari', 
                 'el_allergie_farmaci',
             )
         }),
