@@ -9,5 +9,6 @@ urlpatterns = patterns('',
 
     url(r'^$', RedirectView.as_view(url='/admin/', permanent=False)),
 
+    (r'^grappelli/', include('grappelli.urls')), # grappelli URLS
     url(r'^admin/', include(admin.site.urls)),
 )
