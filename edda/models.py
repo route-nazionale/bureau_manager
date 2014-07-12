@@ -12,6 +12,11 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.conf import settings
+
+import logging
+
+logger = logging.getLogger('__name__')
 
 class Humen(models.Model):
 
@@ -196,10 +201,53 @@ class Humen(models.Model):
 
     def save(self, *args, **kw):
 
+        # Set boolean fields
         self.intolleranze_alimentari = bool(self.el_intolleranze_alimentari)
         self.allergie_alimentari = bool(self.el_allergie_alimentari)
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
+
+        if self.pk: #we are updating an instance
+
+            old_me = Humen.objects.get(pk=self.pk)
+            # check to update idgruppo and idunitagruppo
+            if self.vclan != old_me.vclan:
+                self.idunitagruppo = self.vclan.idunitagruppo
+                self.idgruppo = self.vclan.idgruppo
+
+                #WARNING: non cambiamo il codice univoco...
+
+            created = False
+        else:
+            created = True
+
         super(Humen, self).save(*args, **kw)
+
+        if created:
+            # compute codice unico (cu)
+            self.cu = self.compute_cu()
+            kw.pop('force_insert', None)
+            super(Humen, self).save(*args, **kw)
+
+    def compute_cu(self):
+
+        if self.rs:
+            base_cu = 'AG'
+        elif self.capo:
+            base_cu = 'AA'
+        elif self.oneteam:
+            base_cu = 'OT'
+        elif self.extra:
+            base_cu = 'OT'
+        elif self.lab:
+            base_cu = 'AL'
+        else:
+            raise ValueError("Codice univoco non computabile")
+
+        return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
+
+    def is_young(self):
+
+        return (datetime.datetime.now().year - self.data_nascita.year) < settings.YOUNG_AGE
 
 class Vclans(models.Model):
     idvclan = models.CharField(max_length=255, blank=True)

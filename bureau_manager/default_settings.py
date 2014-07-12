@@ -87,3 +87,5 @@ STATIC_URL = '/static/'
 
 # useful for strftime
 locale.setlocale(locale.LC_ALL, 'it_IT.UTF8')
+
+YOUNG_AGE = 22
