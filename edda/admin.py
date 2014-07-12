@@ -19,7 +19,7 @@ class BaseHumenForm(forms.ModelForm):
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
     CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
-    classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
+    classe_presenza = forms.ChoiceField(widget=forms.Select, choices=CLASSI)
 
     scout = forms.BooleanField(required=False)
     agesci = forms.BooleanField(required=False,label="AGESCI")

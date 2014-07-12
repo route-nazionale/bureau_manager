@@ -14,9 +14,13 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
-import logging
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.core import serializers
 
-logger = logging.getLogger('__name__')
+import logging, datetime
+
+logger = logging.getLogger(__name__)
 
 class Humen(models.Model):
 
@@ -208,7 +212,7 @@ class Humen(models.Model):
         self.allergie_alimentari = bool(self.el_allergie_alimentari)
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
 
-        self.eta = compute(self.data_nascita)
+        self.eta = self.compute_age()
 
         if self.pk: #we are updating an instance
 
@@ -253,12 +257,12 @@ class Humen(models.Model):
 
         return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
 
-    def compute_age(d):
-        datetime.datetime.now().year - d.year
+    def compute_age(self):
+        return datetime.datetime.now().year - self.data_nascita.year
 
     def is_young(self):
 
-        return compute_age(self.data_nascita) < settings.YOUNG_AGE
+        return self.compute_age() < settings.YOUNG_AGE
 
 class Vclans(models.Model):
 
@@ -487,3 +491,13 @@ class RSHumen(Humen):
         proxy = True
         verbose_name = 'RS'
         verbose_name_plural = 'RS'
+
+
+#---------------------------------------------------------------------------------
+
+@receiver(post_save)
+def my_log_queue(sender, **kwargs):
+
+    instance = kwargs['instance']
+    data = serializers.serialize("json", [instance])
+    print("[DB WRITE] %s" % data)
