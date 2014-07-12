@@ -209,7 +209,7 @@ class Humen(models.Model):
         verbose_name_plural = 'persone'
 
     def __unicode__(self):
-        return "%s - %s %s" % (self.cu, self.nome, self.cognome)
+        return u"%s - %s %s" % (self.cu, self.nome, self.cognome)
 
     def save(self, *args, **kw):
 
@@ -275,6 +275,18 @@ class Humen(models.Model):
             raise ValueError("Una persona non può essere arrivata se non è arrivato il suo clan")
         self.arrivati_al_quartiere = is_arrived
         self.dt_verifica_di_arrivo = now()
+
+    @property
+    def handicaps(self):
+        rv = []
+        for k in 'fisiche', 'lis', 'psichiche', 'sensoriali':
+            if getattr(self, k):
+                rv.append(k.upper()[:3])
+
+        if self.patologie.strip():
+            rv.append(self.patologie.strip().upper()[:3])
+
+        return rv
 
 class Vclans(models.Model):
 
