@@ -6,6 +6,7 @@ from edda.models import RSHumen, ChiefHumen, RoutesTest, Vclans
 
 from django.http import HttpResponseRedirect
 from django import forms
+from django.core.urlresolvers import reverse
 
 import copy
 
@@ -275,18 +276,41 @@ class RoutesTestAdmin(admin.ModelAdmin):
         '__unicode__', 'numero', 'area', 'quartiere',
     )
 
+class InlineHumenAdminForm(forms.ModelForm):
+
+    handicap = forms.CharField(widget=forms.TextInput(attrs={'size' : '30'}), required=False)
+
 class HumenInline(admin.TabularInline):
 
     model = Humen
-    #form = HumenAdmin.form
+    #template = "admin/vclans/inline_person.html"
     fields = (
-        'nome', 'cognome', 'ruolo', 
-        'periodo_partecipazione', 
-        'fisiche', 'lis', 'psichiche', 'sensoriali',
-        'patologie', 
+        'nowrap__unicode__', 'ruolo', 'handicaps',
+        'periodo_partecipazione',
     )
+    readonly_fields = ('nowrap__unicode__', 'handicaps')
     extra = 0
 
+    def handicaps(self, obj):
+
+        rv = []
+        if obj.handicaps:
+            rv = map(lambda x : '<span class="btn btn-success" style="margin:0.1em">%s</span>' % x, obj.handicaps)
+
+        if not rv:
+            rv = "(Nessuna)"
+        else:
+            rv = "".join(rv)
+        return rv
+    handicaps.short_description = u"Diversabilità"
+    handicaps.allow_tags = True
+
+    def nowrap__unicode__(self, obj):
+        return u'<div style="white-space: nowrap;"><a href="%s">%s</a></div>' % (
+            reverse('admin:edda_humen_change', args=(obj.pk,)) , unicode(obj).strip()
+        )
+    nowrap__unicode__.short_description = u"Persona"
+    nowrap__unicode__.allow_tags = True
 
 class VclansAdmin(admin.ModelAdmin):
 
