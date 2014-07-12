@@ -194,7 +194,7 @@ class Humen(models.Model):
     )
 
     arrivati_al_quartiere = models.NullBooleanField(default=None)
-    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True)
+    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
     class Meta:
         managed = False
@@ -282,7 +282,7 @@ class Vclans(models.Model):
     created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     arrivati_al_campo = models.NullBooleanField(default=None)
-    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True)
+    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
     
     class Meta:
         managed = False

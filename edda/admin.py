@@ -26,6 +26,8 @@ def only_one_element_allowed(func):
         else:
             return func(modeladmin, request, queryset)
 
+    return my_fun
+
 
 class BaseHumenForm(forms.ModelForm):
 
@@ -295,24 +297,29 @@ class VclansAdmin(admin.ModelAdmin):
         el = queryset[0]
         el.update_arrivo_al_campo(is_arrived=True)
         el.save()
+    arrivati_al_campo.short_description = 'Imposta arrivo al CAMPO'
+    
 
     @only_one_element_allowed
     def non_arrivati_al_campo(self, request, queryset):
         el = queryset[0]
         el.update_arrivo_al_campo(is_arrived=True)
         el.save()
+    non_arrivati_al_campo.short_description = 'Imposta il MANCATO ARRIVO al CAMPO'
 
     @only_one_element_allowed
     def arrivati_al_quartiere(self, request, queryset):
         for el in queryset[0].humen_set.all():
             el.update_arrivo_al_quartiere(is_arrived=True)
             el.save()
+    arrivati_al_quartiere.short_description = 'Imposta arrivo al QUARTIERE'
 
     @only_one_element_allowed
     def non_arrivati_al_quartiere(self, request, queryset):
         for el in queryset[0].humen_set.all():
             el.update_arrivo_al_quartiere(is_arrived=False)
             el.save()
+    non_arrivati_al_quartiere.short_description = 'Imposta il MANCATO ARRIVO al QUARTIERE'
 
 
 admin.site.register(Humen, BaseHumenAdmin)
