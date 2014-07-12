@@ -18,6 +18,13 @@ class BaseHumenForm(forms.ModelForm):
     codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False)
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
+    CLASSI = (('RS','RS'), ('CA','Capo'),('EX','Extra'), ('LA','Lab'), ('OT', 'Oneteam'))
+    classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
+
+    novizio = forms.BooleanField(required=False)
+    scout = forms.BooleanField(required=False)
+    agesci = forms.BooleanField(required=False,label="AGESCI")
+
     def __init__(self, *args, **kw):
 
         super(BaseHumenForm, self).__init__(*args, **kw)
@@ -25,6 +32,19 @@ class BaseHumenForm(forms.ModelForm):
         disable_field(self.fields['cu'])
         if kw.has_key('instance'):
             disable_field(self.fields['codice_censimento'])
+            instance = kw['instance']
+            classe = 'OT'
+            if instance.rs:
+                classe = 'RS'
+            elif instance.capo:
+                classe = 'CA'
+            elif instance.lab:
+                classe = 'LA'
+            elif instance.extra:
+                classe = 'EX'
+            elif instance.oneteam:
+                classe = 'OT'
+            self.fields['classe_presenza'].initial = classe
 
     def clean(self):
 
@@ -91,12 +111,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
         ('Partecipazione', {
             'fields': (
-                'ruolo', 'periodo_partecipazione', ('pagato', 'mod_pagamento_id'), 
+                'ruolo', 'periodo_partecipazione', ('pagato'), 
             )
         }),
         ('Ruoli', {
             'fields': (
-                ('lab', 'novizio', 'scout', 'agesci', 'rs', 'capo', 'oneteam', 'extra'),  
+                ('classe_presenza', 'scout', 'agesci', 'novizio'),  
             )
         }),
         ('Strade di coraggio', {
@@ -127,6 +147,16 @@ class BaseHumenAdmin(admin.ModelAdmin):
     def add_humen(self, request, queryset):
         return HttpResponseRedirect("/admin/edda/humen/add/")
     add_humen.short_description = 'Aggiungi Persona'
+
+    def save_model(self, request, obj, form, changed):
+        
+        obj.rs = form.cleaned_data['classe_presenza'] == 'RS'
+        obj.capo = form.cleaned_data['classe_presenza'] == 'CA'
+        obj.extra = form.cleaned_data['classe_presenza'] == 'EX'
+        obj.lab = form.cleaned_data['classe_presenza'] == 'LA'
+        obj.oneteam = form.cleaned_data['classe_presenza'] == 'OT'
+
+        obj.save()
 
     class Media:
         css = {

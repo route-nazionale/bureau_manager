@@ -114,7 +114,7 @@ class Humen(models.Model):
         verbose_name='OneTeam', help_text=''
     )
     extra = models.NullBooleanField(default=False,
-        verbose_name='esterno', help_text=''
+        verbose_name='Extra', help_text=''
     )
 
     # Strade di coraggio -----------------------------------    
