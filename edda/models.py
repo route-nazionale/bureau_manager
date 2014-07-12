@@ -206,6 +206,8 @@ class Humen(models.Model):
         self.allergie_alimentari = bool(self.el_allergie_alimentari)
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
 
+        self.eta = compute(self.data_nascita)
+
         if self.pk: #we are updating an instance
 
             old_me = Humen.objects.get(pk=self.pk)
@@ -249,9 +251,12 @@ class Humen(models.Model):
 
         return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
 
+    def compute_age(d):
+        datetime.datetime.now().year - d.year
+
     def is_young(self):
 
-        return (datetime.datetime.now().year - self.data_nascita.year) < settings.YOUNG_AGE
+        return compute_age(self.data_nascita) < settings.YOUNG_AGE
 
 class Vclans(models.Model):
 

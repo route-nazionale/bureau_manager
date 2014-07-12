@@ -112,7 +112,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
         ('Anagrafica', {
             'fields': (
-                ('nome', 'cognome'), ('sesso', 'data_nascita', 'eta'),  
+                ('nome', 'cognome'), ('sesso', 'data_nascita'),  
                 ('cellulare', 'email'), 
                 ('abitazione', 'indirizzo', 'provincia', 'cap', 'citta'),
             )
