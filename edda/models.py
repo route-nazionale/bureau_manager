@@ -34,7 +34,7 @@ class Humen(models.Model):
     )
     
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
-        verbose_name='clan', help_text='', null=True
+        verbose_name='clan', help_text='', null=True, blank=True
     )
     
     # Anagrafiche --------------------------------------
@@ -211,8 +211,12 @@ class Humen(models.Model):
             old_me = Humen.objects.get(pk=self.pk)
             # check to update idgruppo and idunitagruppo
             if self.vclan != old_me.vclan:
-                self.idunitagruppo = self.vclan.idunitagruppo
-                self.idgruppo = self.vclan.idgruppo
+                if self.vclan:
+                    self.idunitagruppo = self.vclan.idunitagruppo
+                    self.idgruppo = self.vclan.idgruppo
+                else:
+                    self.idunitagruppo = ''
+                    self.idgruppo = ''
 
                 #WARNING: non cambiamo il codice univoco...
 
