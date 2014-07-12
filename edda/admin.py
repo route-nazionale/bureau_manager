@@ -18,7 +18,7 @@ class BaseHumenForm(forms.ModelForm):
     codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False)
     cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
 
-    CLASSI = (('RS','RS'), ('CA','Capo'),('EX','Extra'), ('LA','Lab'), ('OT', 'Oneteam'))
+    CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadri'), ('LA','Laboratori'))
     classe_presenza = forms.MultipleChoiceField(widget=forms.Select, choices=CLASSI)
 
     novizio = forms.BooleanField(required=False)
@@ -105,6 +105,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('vclan', 'codice_censimento'),
+                ('scout', 'agesci', 'classe_presenza', 'novizio'),  
                 ('cu',),  
             )
         }),
@@ -118,11 +119,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
         ('Partecipazione', {
             'fields': (
                 'ruolo', 'periodo_partecipazione', ('pagato'), 
-            )
-        }),
-        ('Ruoli', {
-            'fields': (
-                ('classe_presenza', 'scout', 'agesci', 'novizio'),  
             )
         }),
         ('Strade di coraggio', {
