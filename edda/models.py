@@ -18,6 +18,9 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core import serializers
 
+import logging
+from django.utils.timezone import now
+
 import logging, datetime
 
 logger = logging.getLogger(__name__)
@@ -196,6 +199,9 @@ class Humen(models.Model):
         verbose_name='ultimo aggiornamento', help_text='', auto_now=True
     )
 
+    arrivati_al_quartiere = models.NullBooleanField(default=None)
+    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
+
     class Meta:
         managed = False
         db_table = 'humen'
@@ -264,6 +270,12 @@ class Humen(models.Model):
 
         return self.compute_age() < settings.YOUNG_AGE
 
+    def update_arrivo_al_quartiere(self, is_arrived):
+        if is_arrived and self.vclan and not self.vclan.is_arrived:
+            raise ValueError("Una persona non può essere arrivata se non è arrivato il suo clan")
+        self.arrivati_al_quartiere = is_arrived
+        self.dt_verifica_di_arrivo = now()
+
 class Vclans(models.Model):
 
     idvclan = models.CharField(max_length=255, blank=True)
@@ -272,9 +284,12 @@ class Vclans(models.Model):
     ordinale = models.CharField(max_length=255, blank=True)
     nome = models.CharField(max_length=255, blank=True)
     regione = models.CharField(max_length=255, blank=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True, auto_now=True)
+    created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
+    arrivati_al_campo = models.NullBooleanField(default=None)
+    dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
+    
     class Meta:
         managed = False
         db_table = 'vclans'
@@ -283,6 +298,10 @@ class Vclans(models.Model):
 
     def __unicode__(self):
         return u"%s (%s)" % (self.nome, self.idunitagruppo)
+
+    def update_arrivo_al_campo(self, is_arrived):
+        self.arrivati_al_campo = is_arrived
+        self.dt_verifica_di_arrivo = now()
 
 class Chiefroles(models.Model):
     kkey = models.IntegerField(blank=True, null=True)
