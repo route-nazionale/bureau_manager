@@ -9,14 +9,30 @@ from django import forms
 
 import copy
 
+def disable_field(field):
+    field.widget.attrs.update({'disabled' : 'true'})
+
 class BaseHumenForm(forms.ModelForm):
 
     patologie = forms.CharField(widget=forms.Textarea(attrs={'class':'vLargeTextField'}), required=False)
+    codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False)
+    cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False)
+
+    def __init__(self, *args, **kw):
+
+        super(BaseHumenForm, self).__init__(*args, **kw)
+
+        disable_field(self.fields['cu'])
+        if kw.has_key('instance'):
+            disable_field(self.fields['codice_censimento'])
 
     def clean(self):
 
         cleaned_data = super(BaseHumenForm, self).clean()
         cleaned_data['el_allergie_farmaci'] = cleaned_data['el_allergie_farmaci'].strip()
+        if self.instance:
+            cleaned_data['codice_censimento'] = self.instance.codice_censimento
+            cleaned_data['cu'] = self.instance.cu
         return cleaned_data
 
 
@@ -27,6 +43,7 @@ class BaseHumenForm(forms.ModelForm):
 class BaseHumenAdmin(admin.ModelAdmin):
 
     form = BaseHumenForm
+    save_on_top = True
 
     list_display = [
         '__unicode__',
@@ -62,7 +79,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('vclan', 'codice_censimento'),
-                ('cu', 'idgruppo', 'idunitagruppo',),  
+                ('cu',),  
             )
         }),
         ('Anagrafica', {
