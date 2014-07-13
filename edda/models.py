@@ -55,7 +55,7 @@ class Humen(models.Model):
     sesso = models.CharField(max_length=255, blank=True,
         verbose_name='sesso', help_text='', null=True
     )
-    data_nascita = models.DateField(blank=True, null=True,
+    data_nascita = models.DateField(null=True,
         verbose_name='data di nascita', help_text=''
     )
     eta = models.IntegerField(blank=True, null=True,
@@ -264,7 +264,7 @@ class Humen(models.Model):
         return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
 
     def compute_age(self):
-        return datetime.datetime.now().year - self.data_nascita.year
+        return datetime.date.today().year - self.data_nascita.year
 
     def is_young(self):
 

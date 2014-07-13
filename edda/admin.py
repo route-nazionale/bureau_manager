@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django.contrib import messages
 from edda.models import Humen, Chiefroles, Periodipartecipaziones
 from edda.models import RSHumen, ChiefHumen, RoutesTest, Vclans
 
@@ -50,14 +51,14 @@ class ReadOnlyForm(forms.ModelForm):
 
 class BaseHumenForm(forms.ModelForm):
 
-    patologie = forms.CharField(widget=forms.Textarea(attrs={'class':'vLargeTextField'}), required=False, label='patologie')
-    codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False, label='cod. censimento')
-    cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False, label='codice univoco')
+    patologie = forms.CharField(widget=forms.Textarea(attrs={'class':'vLargeTextField'}), required=False, label='Patologie')
+    codice_censimento = forms.CharField(widget=forms.TextInput(attrs={'size':20}), required=False, label='Cod. censimento')
+    cu = forms.CharField(widget=forms.TextInput(attrs={'size': 14}), required=False, label='Codice univoco')
 
     CLASSI = (('RS','RS'), ('CA','Capo'), ('OT', 'Oneteam'), ('EX','Quadro'), ('LA','Laboratori'))
-    classe_presenza = forms.ChoiceField(widget=forms.Select, choices=CLASSI, label="tipo")
+    classe_presenza = forms.ChoiceField(widget=forms.Select, choices=CLASSI, label="Tipo")
 
-    scout = forms.BooleanField(required=False, label='scout')
+    scout = forms.BooleanField(required=False, label='Scout')
     agesci = forms.BooleanField(required=False,label="AGESCI")
 
     stradadicoraggio1 = forms.BooleanField(required=False, label="Il coraggio di amare (1)")
@@ -71,7 +72,7 @@ class BaseHumenForm(forms.ModelForm):
         super(BaseHumenForm, self).__init__(*args, **kw)
 
         disable_field(self.fields['cu'])
-        if kw.has_key('instance'):
+        if kw.get('instance'):
             disable_field(self.fields['codice_censimento'])
             instance = kw['instance']
 
@@ -145,7 +146,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 ('vclan', 'codice_censimento'),
                 ('scout', 'agesci', 'classe_presenza'),  
                 ('cu',),  
-            )
+            ),
+            'classes' : ('wide',)
         }),
         ('Anagrafica', {
             'fields': (
@@ -194,6 +196,22 @@ class BaseHumenAdmin(admin.ModelAdmin):
     #def add_humen(self, request, queryset):
     #    return HttpResponseRedirect("/admin/edda/humen/add/")
     #add_humen.short_description = 'Aggiungi Persona'
+
+    def change_view(self, request, *args, **kw):
+        self.message_user(request, "[DA FARE]: se non metti il codice censimento, viene generato automaticamente", level=messages.ERROR)
+        self.message_user(request, "[DA FARE]: puoi impostare arrivato/non viene", level=messages.ERROR)
+        self.message_user(request, "[DA FARE]: i campi devono essere riposizionati in modo che tutte le etichette siano in bianco e non in grigio e tutte le caselle di testo grandi siano anche lunghe", level=messages.ERROR)
+        self.message_user(request, u"[DA FARE]: alcuni inserimenti possono essere semplificati (v. diversabilità)", level=messages.WARNING)
+        
+        return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
+
+    def add_view(self, request, *args, **kw):
+        self.message_user(request, "[DA FARE]: se non metti il codice censimento, viene generato automaticamente", level=messages.ERROR)
+        self.message_user(request, "[DA FARE]: puoi impostare arrivato/non viene", level=messages.ERROR)
+        self.message_user(request, "[DA FARE]: i campi devono essere riposizionati in modo che tutte le etichette siano in bianco e non in grigio e tutte le caselle di testo grandi siano anche lunghe", level=messages.ERROR)
+        self.message_user(request, u"[DA FARE]: alcuni inserimenti possono essere semplificati (v. diversabilità)", level=messages.WARNING)
+        
+        return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
     def arrivati_al_quartiere(self, request, queryset):
         self.message_user(request, 'Benvenuti: %s' % " ".join(map(unicode, queryset)))
