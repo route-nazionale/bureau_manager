@@ -283,9 +283,6 @@ class Humen(models.Model):
             if getattr(self, k):
                 rv.append(k.upper()[:3])
 
-        if self.patologie.strip():
-            rv.append(self.patologie.strip().upper()[:3])
-
         return rv
 
 class Vclans(models.Model):

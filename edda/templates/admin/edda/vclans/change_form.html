@@ -1,0 +1,23 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+    <!-- <li><a href="do-check-in-campo/" class="actionlink" dove="CAMPO"><i
+        class="icon-time icon-alpha75"></i>Imposta arrivo al CAMPO</a>
+    </li> -->
+    <li><a href="do-check-in-quartiere/" class="actionlink" dove="QUARTIERE"><i
+        class="icon-time icon-alpha75"></i>Imposta arrivo al QUARTIERE</a>
+    </li>
+    <script type="text/javascript">
+        $('.actionlink').click(function (e) {
+            var el = e.target;
+            $.post(el.href, { 
+                success : function(response) {
+                    alert('Operazione eseguita con successo. Benvenuti al ' + $(el).attr('dove'));
+                }
+            });
+        
+            e.stopPropagation();
+            return false;
+        });
+    </script>
+{% endblock %}

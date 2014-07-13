@@ -35,11 +35,6 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 # Application definition
 
 INSTALLED_APPS = (
-    'suit',
-    #'admin_bootstrap',
-    #'django_admin_bootstrapped.bootstrap3',
-    #'django_admin_bootstrapped',
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,6 +43,11 @@ INSTALLED_APPS = (
 #    'base',
 #    'badge',
     'edda',
+
+    'suit',
+    #'django_admin_bootstrapped.bootstrap3',
+    #'django_admin_bootstrapped',
+    'django.contrib.admin',
 )
 
 MIDDLEWARE_CLASSES = (
