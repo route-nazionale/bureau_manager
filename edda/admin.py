@@ -186,7 +186,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
     actions = [
         'arrivati_al_quartiere', 
         'non_arrivati_al_quartiere',
-        'imposta_ritirati',
+        #'imposta_ritirati',
     ]
 
     change_list_template = "admin/change_list_pagination_on_top.html"
@@ -216,20 +216,20 @@ class BaseHumenAdmin(admin.ModelAdmin):
         for el in queryset:
             el.update_arrivo_al_quartiere(is_arrived=True)
             el.save()
-    arrivati_al_quartiere.short_description = 'Imposta arrivo al QUARTIERE'
+    arrivati_al_quartiere.short_description = "CONFERMA L'ARRIVO DI QUESTA PERSONA"
 
     def non_arrivati_al_quartiere(self, request, queryset):
         for el in queryset:
             el.update_arrivo_al_quartiere(is_arrived=False)
             el.save()
-    non_arrivati_al_quartiere.short_description = 'Imposta il MANCATO ARRIVO al QUARTIERE'
+    non_arrivati_al_quartiere.short_description = "REGISTRA CHE QUESTA PERSONA NON VIENE"
 
-    def imposta_ritirati(self, request, queryset):
-        for el in queryset:
-            el.ritirato = True
-            el.update_arrivo_al_quartiere(is_arrived=False)
-            el.save()
-    imposta_ritirati.short_description = 'Imposta RITIRO'
+    #def imposta_ritirati(self, request, queryset):
+    #    for el in queryset:
+    #        el.ritirato = True
+    #        el.update_arrivo_al_quartiere(is_arrived=False)
+    #        el.save()
+    #imposta_ritirati.short_description = 'Imposta RITIRO'
 
     def my_class(self, obj):
 
@@ -334,6 +334,14 @@ class VclansAdmin(admin.ModelAdmin):
         HumenInline,
     ]
     form = ReadOnlyForm
+
+    search_fields = [
+        'nome',
+    ]
+
+    list_filter = [
+        'nome',
+    ]
 
     actions = [
         'arrivati_al_campo', 

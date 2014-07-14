@@ -199,7 +199,7 @@ class Humen(models.Model):
         verbose_name='ultimo aggiornamento', help_text='', auto_now=True
     )
 
-    arrivati_al_quartiere = models.NullBooleanField(default=None)
+    arrivato_al_quartiere = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
     class Meta:
@@ -297,9 +297,9 @@ class Humen(models.Model):
         return self.compute_age() < settings.YOUNG_AGE
 
     def update_arrivo_al_quartiere(self, is_arrived):
-        if is_arrived and self.vclan and not self.vclan.is_arrived:
+        if is_arrived and self.vclan and not self.vclan.arrivato_al_campo:
             raise ValueError("Una persona non può essere arrivata se non è arrivato il suo clan")
-        self.arrivati_al_quartiere = is_arrived
+        self.arrivato_al_quartiere = is_arrived
         self.dt_verifica_di_arrivo = now()
 
     @property
@@ -322,7 +322,7 @@ class Vclans(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True, auto_now=True)
     created_at = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
-    arrivati_al_campo = models.NullBooleanField(default=None)
+    arrivato_al_campo = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
     
     class Meta:
@@ -335,8 +335,19 @@ class Vclans(models.Model):
         return u"%s (%s)" % (self.nome, self.idunitagruppo)
 
     def update_arrivo_al_campo(self, is_arrived):
-        self.arrivati_al_campo = is_arrived
+        self.arrivato_al_campo = is_arrived
         self.dt_verifica_di_arrivo = now()
+
+    def update_arrivo_al_quartiere(self, is_arrived):
+        """
+        Setta lo stato `is_arrived` (True o False) per tutti
+        i membri del clan che non sono già stati segnalati come
+        ritirati.
+        """
+
+        for h in self.humen_set.exclude(arrivato_al_quartiere=False):
+            h.update_arrivo_al_quartiere(is_arrived)
+            h.save()
 
 class Chiefroles(models.Model):
     kkey = models.IntegerField(blank=True, null=True)

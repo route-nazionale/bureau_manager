@@ -1,0 +1,61 @@
+{% extends "admin/edda/change_form.html" %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    {% if change %}
+        {% if not original.arrivato_al_quartiere and original.vclan.arrivato_al_campo %}
+            <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO</button>
+        {% endif %}
+        {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
+            <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
+        {% endif %}
+
+    <script type="text/javascript">
+        $('.bureau-buttons').click(function (e) {
+            var el = $(e.target);
+            $.post(el.attr('href'), {})
+                .done(function(data) {
+                    if (data != "OK") {
+                        alert("Non hai i permessi necessari per eseguire l'operazione");
+                    } else {
+                        alert('Operazione "' + el.text() + '" eseguita con successo!');
+                        $(el).remove();
+                    }
+                })
+                .fail(function(data) {
+                    alert("Non hai i permessi necessari per eseguire l'operazione");
+                });
+        
+            e.stopPropagation();
+            return false;
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block object-tools %} {# nascondiamo il blocco #} {% endblock %}
+
+{% block object-tools-items %}
+    {% comment %}
+    <li><a href="do-check-in-quartiere/" class="actionlink" dove="QUARTIERE"><i
+        class="icon-time icon-alpha75"></i>CONFERMA L'ARRIVO DI QUESTA PERSONA</a>
+    </li>
+    <li><a href="do-set-retired-quartiere/" class="actionlink" dove="QUARTIERE"><i
+        class="icon-time icon-alpha75"></i>REGISTRA CHE QUESTA PERSONA NON VIENE</a>
+    </li>
+    <script type="text/javascript">
+        $('.actionlink').click(function (e) {
+            var el = e.target;
+            $.post(el.href, { 
+                success : function(response) {
+                    alert('Operazione "' + el.innerHTML + '" eseguita con successo!');
+                }
+            });
+        
+            e.stopPropagation();
+            return false;
+        });
+    </script>
+    {% endcomment %}
+{% endblock %}
+
