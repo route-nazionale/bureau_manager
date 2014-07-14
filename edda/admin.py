@@ -304,7 +304,7 @@ class HumenInline(admin.TabularInline):
         'nowrap__unicode__', 'ruolo', 'handicaps',
         'periodo_partecipazione',
     )
-    readonly_fields = ('nowrap__unicode__', 'handicaps')
+    readonly_fields = ('nowrap__unicode__', 'handicaps', 'ruolo', 'periodo_partecipazione')
     extra = 0
 
     def handicaps(self, obj):
@@ -366,7 +366,8 @@ class VclansAdmin(admin.ModelAdmin):
                 'regione',)
             )
         }),
-    )
+    :
+    readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione')
 
     @only_one_element_allowed
     def arrivati_al_campo(self, request, queryset):
