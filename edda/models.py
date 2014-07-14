@@ -146,11 +146,19 @@ class Humen(models.Model):
     
     # Alimentazione --------------------------------------------
 
-    colazione = models.ForeignKey('Colaziones', db_column='colazione',
+    colazione_fk = models.ForeignKey('Colaziones', db_column='colazione',
         verbose_name='tipo di colazione', help_text='', null=True, blank=True
     )
-    dieta_alimentare = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
+    dieta_alimentare_fk = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
         verbose_name='dieta alimentare', help_text='', null=True, blank=True
+    )
+    colazione = models.CharField(max_length=14, db_column='colazione_str',
+        verbose_name='tipo di colazione', help_text='', blank=True,
+        choices = (('LATTE', 'LATTE'), ('THE','THE'), ('ALTRO','ALTRO'))
+    )
+    dieta_alimentare = models.CharField(max_length=14, db_column='dieta_alimentare',
+        verbose_name='dieta alimentare', help_text='', blank=True,
+        choices = (('STANDARD','STANDARD'),('VEGETARIANO','VEGETARIANO'),('VEGANO','VEGANO'))
     )
     intolleranze_alimentari = models.NullBooleanField(default=False,
         verbose_name='intolleranze alimentari', help_text=''
@@ -203,7 +211,7 @@ class Humen(models.Model):
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
     class Meta:
-        managed = False
+        #managed = False
         db_table = 'humen'
         verbose_name = 'persona'
         verbose_name_plural = 'persone'
@@ -324,9 +332,12 @@ class Vclans(models.Model):
 
     arrivato_al_campo = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
+
+    route = models.ForeignKey('Routes', db_column='route_id', null=True)
+    is_ospitante = models.NullBooleanField(default=None)
     
     class Meta:
-        managed = False
+        #managed = False
         db_table = 'vclans'
         verbose_name = 'clan'
         verbose_name_plural = 'clan'
@@ -432,7 +443,7 @@ class Districts(models.Model):
         return self.name
 
 class Gemellaggios(models.Model):
-    route = models.ForeignKey('RoutesTest', db_column='route_id')
+    route = models.ForeignKey('Routes', db_column='route_id')
     vclan = models.ForeignKey('Vclans', db_column='vclan_id')
     ospitante = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
@@ -464,7 +475,7 @@ class Periodipartecipaziones(models.Model):
     def __unicode__(self):
         return u"%s - %s" % (self.ruolo, self.description)
 
-class RoutesOrig(models.Model):
+class Routes(models.Model):
     name = models.CharField(max_length=255, blank=True)
     numero = models.IntegerField(blank=True, null=True)
     area = models.CharField(max_length=255, blank=True)
@@ -475,21 +486,7 @@ class RoutesOrig(models.Model):
     contrada_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
-        db_table = 'routes_orig'
-
-class RoutesTest(models.Model):
-    name = models.CharField(max_length=255, blank=True)
-    numero = models.IntegerField(blank=True, null=True)
-    area = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    quartiere = models.IntegerField(blank=True, null=True)
-    quartiere_lock = models.IntegerField(blank=True, null=True)
-    contrada_id = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
+        #managed = False
         db_table = 'routes_test'
         verbose_name = 'Route'
         verbose_name_plural = 'Route'
@@ -506,27 +503,6 @@ class Topics(models.Model):
     class Meta:
         managed = False
         db_table = 'topics'
-
-# ----------------------------------
-
-class SchemaMigrations(models.Model):
-    version = models.CharField(unique=True, max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'schema_migrations'
-
-
-
-class DjangoMigrations(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
 
 #--------------------------------------------------------------------------------
 

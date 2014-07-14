@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from edda.models import Humen, Chiefroles, Periodipartecipaziones
-from edda.models import RSHumen, ChiefHumen, RoutesTest, Vclans
+from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 
 from django.http import HttpResponseRedirect
 from django import forms
@@ -287,7 +287,7 @@ class PeriodipartecipazionesAdmin(admin.ModelAdmin):
         '__unicode__',
     )
     
-class RoutesTestAdmin(admin.ModelAdmin):
+class RoutesAdmin(admin.ModelAdmin):
     list_display = (
         '__unicode__', 'numero', 'area', 'quartiere',
     )
@@ -366,7 +366,8 @@ class VclansAdmin(admin.ModelAdmin):
                 'regione',)
             )
         }),
-    :
+    )
+
     readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione')
 
     @only_one_element_allowed
@@ -404,6 +405,6 @@ admin.site.register(Humen, BaseHumenAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Chiefroles, ChiefrolesAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)
-admin.site.register(RoutesTest, RoutesTestAdmin)
+admin.site.register(Routes, RoutesAdmin)
 
 admin.site.register(Vclans, VclansAdmin)
