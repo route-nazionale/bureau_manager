@@ -121,3 +121,5 @@ LOGGING = {
         },
     },
 }
+
+MAX_USABLE_CODICE_CENSIMENTO = 2999

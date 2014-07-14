@@ -41,7 +41,7 @@ class Humen(models.Model):
     )
     
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
-        verbose_name='clan', help_text='', null=True, blank=True
+        verbose_name='clan', help_text='', null=True
     )
     
     # Anagrafiche --------------------------------------
@@ -238,6 +238,10 @@ class Humen(models.Model):
         else:
             created = True
 
+            # Check for codice_censimento. Se non esiste -> crealo automaticamente!
+            if not self.codice_censimento:
+                self.assign_codice_censimento()
+                        
         super(Humen, self).save(*args, **kw)
 
         if created:
@@ -245,6 +249,28 @@ class Humen(models.Model):
             self.cu = self.compute_cu()
             kw.pop('force_insert', None)
             super(Humen, self).save(*args, **kw)
+
+    def assign_codice_censimento(self):
+        """
+        Assegna il primo codice censimento valido < 3000
+        """
+
+        if self.codice_censimento:
+            raise ValueError(
+                u"Questo umano ha già un codice censimento assegnato (=%s)" % self.codice_censimento
+        )
+
+        taken_codes = Humen.objects.filter(
+            codice_censimento__lte=settings.MAX_USABLE_CODICE_CENSIMENTO
+        ).values_list('codice_censimento').order_by('codice_censimento')
+        last_taken_code = 0
+        for taken_code in taken_codes:
+            taken_code = taken_code[0] # taken_code is a tuple
+            if taken_code != None: # avoid NULLs
+                if taken_code == last_taken_code + 1:
+                    last_taken_code = taken_code
+                else:
+                    self.codice_censimento = last_taken_code + 1
 
     def compute_cu(self):
 
