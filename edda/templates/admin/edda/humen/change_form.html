@@ -5,9 +5,13 @@
     {% if change %}
         {% if not original.arrivato_al_quartiere and original.vclan.arrivato_al_campo %}
             <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO</button>
+        {% else %}
+            <button name="_is_here" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">È QUI CON NOI IN ROUTE!</button>
         {% endif %}
         {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
             <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
+        {% else %}
+            <button name="_retired" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</button>
         {% endif %}
 
     <script type="text/javascript">
@@ -34,11 +38,12 @@
 {% endblock %}
 
 {% block object-tools-items %}
-    mettiamo qui "vai al suo clan"
+    {% if change and original.vclan %}
+        <li><a href="{% url 'admin:edda_vclans_change' original.vclan.pk %}" class="actionlink" ><i
+            class="icon-time icon-alpha75"></i>VAI AL SUO CLAN</a>
+        </li>
+    {% endif %}
     {% comment %}
-    <li><a href="do-check-in-quartiere/" class="actionlink" dove="QUARTIERE"><i
-        class="icon-time icon-alpha75"></i>CONFERMA L'ARRIVO DI QUESTA PERSONA</a>
-    </li>
     <li><a href="do-set-retired-quartiere/" class="actionlink" dove="QUARTIERE"><i
         class="icon-time icon-alpha75"></i>REGISTRA CHE QUESTA PERSONA NON VIENE</a>
     </li>
