@@ -198,16 +198,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
     #add_humen.short_description = 'Aggiungi Persona'
 
     def change_view(self, request, *args, **kw):
-        self.message_user(request, "[DA FARE]: puoi impostare arrivato/non viene", level=messages.ERROR)
-        self.message_user(request, "[DA FARE]: i campi devono essere riposizionati in modo che tutte le etichette siano in bianco e non in grigio e tutte le caselle di testo grandi siano anche lunghe", level=messages.ERROR)
-        self.message_user(request, u"[DA FARE]: alcuni inserimenti possono essere semplificati (v. diversabilità)", level=messages.WARNING)
+        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
         
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
     def add_view(self, request, *args, **kw):
-        self.message_user(request, "[DA FARE]: puoi impostare arrivato/non viene", level=messages.ERROR)
-        self.message_user(request, "[DA FARE]: i campi devono essere riposizionati in modo che tutte le etichette siano in bianco e non in grigio e tutte le caselle di testo grandi siano anche lunghe", level=messages.ERROR)
-        self.message_user(request, u"[DA FARE]: alcuni inserimenti possono essere semplificati (v. diversabilità)", level=messages.WARNING)
+        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
         
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
