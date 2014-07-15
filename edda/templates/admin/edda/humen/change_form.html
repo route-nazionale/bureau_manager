@@ -6,7 +6,7 @@
     {% if change %}
         {% if not original.arrivato_al_quartiere and original.vclan.arrivato_al_campo %}
             <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO</button>
-        {% else %}
+        {% elif original.arrivato_al_quartiere %}
             <button name="_is_here" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">È QUI CON NOI IN ROUTE!</button>
         {% endif %}
         {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
