@@ -1,5 +1,11 @@
 {% extends "admin/change_form.html" %}
 
+{% block extrahead %}
+    <style type="text/css">
+        tr.add-row : { display:none };
+    </style>
+{% endblock %}
+
 {% block submit_buttons_bottom %}
     {{ block.super }}
     {% if change %}
@@ -9,7 +15,16 @@
             <button name="_set_retired_campo" href="do-set-retired-campo/" class="btn btn-high btn-danger bureau-buttons" type="submit">RITIRA IL CLAN DALLA ROUTE</button>
         {% endif %}
 
+        <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
+        
     <script type="text/javascript">
+
+        $('button[name=_add_rover_o_scolta]').click(function (e) {
+            window.open('{% url "admin:edda_humen_add" %}?vclan_id={{ original.pk }}');
+            e.stopPropagation();
+            return false;
+        });
+
         $('.bureau-buttons').click(function (e) {
             var el = $(e.target);
             $.post(el.attr('href'), {})
@@ -31,6 +46,7 @@
     </script>
     {% endif %}
 {% endblock %}
+
 
 {% block object-tools %} {# nascondiamo il blocco #} {% endblock %}
 

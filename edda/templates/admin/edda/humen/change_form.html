@@ -1,4 +1,5 @@
 {% extends "admin/edda/change_form.html" %}
+{% load i18n %}
 
 {% block submit_buttons_bottom %}
     {{ block.super }}
@@ -37,9 +38,18 @@
     {% endif %}
 {% endblock %}
 
-{% block object-tools-items %}
+{% block object-tools %}
+  {% if not is_popup %}
+    <h4 class="italic-title">{% trans 'tools'|capfirst %}</h4>
+    <ul class="box menu-box">
+      {% block object-tools-items %}
+
     {% if change and original.vclan %}
         <li><a href="{% url 'admin:edda_vclans_change' original.vclan.pk %}" class="actionlink" ><i
+            class="icon-time icon-alpha75"></i>VAI AL SUO CLAN</a>
+        </li>
+    {% elif request.GET.vclan_id %}
+        <li><a href="{% url 'admin:edda_vclans_change' request.GET.vclan_id %}" class="actionlink" ><i
             class="icon-time icon-alpha75"></i>VAI AL SUO CLAN</a>
         </li>
     {% endif %}
@@ -61,5 +71,15 @@
         });
     </script>
     {% endcomment %}
+    {% endblock %}
+   {% endif %}
 {% endblock %}
 
+{% block sidebar_content %}
+{% if request.GET.vclan_id %}
+<script type="text/javascript">
+    $('#id_vclan').val({{ request.GET.vclan_id }});
+    $('#id_scout').prop('checked', true);
+</script>
+{% endif %}
+{% endblock %}
