@@ -85,8 +85,8 @@ class Humen(models.Model):
    
     # Partecipazione -------------------------------
  
-    ruolo = models.ForeignKey('Chiefroles', db_column='ruolo_id',
-        verbose_name='ruolo', help_text='', null=True, blank=True
+    ruolo = models.CharField(max_length=32,
+        verbose_name='ruolo', help_text='', blank=True
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text='', null=True
@@ -142,13 +142,7 @@ class Humen(models.Model):
     
     # Alimentazione --------------------------------------------
 
-    colazione_fk = models.ForeignKey('Colaziones', db_column='colazione',
-        verbose_name='tipo di colazione', help_text='', null=True, blank=True
-    )
-    dieta_alimentare_fk = models.ForeignKey('Dietabases', db_column='dieta_alimentare_id',
-        verbose_name='dieta alimentare', help_text='', null=True, blank=True
-    )
-    colazione = models.CharField(max_length=14, db_column='colazione_str',
+    colazione = models.CharField(max_length=14, db_column='colazione',
         verbose_name='tipo di colazione', help_text='', blank=True,
         choices = (('LATTE', 'LATTE'), ('THE','THE'), ('ALTRO','ALTRO'))
     )
@@ -329,8 +323,8 @@ class Vclans(models.Model):
     arrivato_al_campo = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
-    route = models.ForeignKey('Routes', db_column='route_id', null=True)
-    is_ospitante = models.NullBooleanField(default=None)
+    #route = models.ForeignKey('Routes', db_column='route_id', null=True)
+    #is_ospitante = models.NullBooleanField(default=None)
     
     class Meta:
         #managed = False
@@ -356,36 +350,6 @@ class Vclans(models.Model):
             h.update_arrivo_al_quartiere(is_arrived)
             h.save()
 
-class Chiefroles(models.Model):
-    kkey = models.IntegerField(blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, verbose_name='ruolo')
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'chiefroles'
-        verbose_name = 'ruolo'
-        verbose_name_plural = 'ruoli'
-
-    def __unicode__(self):
-        return self.description
-
-class Colaziones(models.Model):
-    kkey = models.IntegerField(blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'colaziones'
-        verbose_name = 'tipo di colazione'
-        verbose_name_plural = 'tipi di colazione'
-
-    def __unicode__(self):
-        return self.name
-
 class Contradas(models.Model):
     numero = models.IntegerField(blank=True, null=True)
     district_id = models.IntegerField(blank=True, null=True)
@@ -401,21 +365,6 @@ class Contradas(models.Model):
         db_table = 'contradas'
         verbose_name = 'contrada'
         verbose_name_plural = 'contrade'
-
-    def __unicode__(self):
-        return self.name
-
-class Dietabases(models.Model):
-    kkey = models.IntegerField(blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'dietabases'
-        verbose_name = 'dieta alimentare'
-        verbose_name_plural = 'diete alimentari'
 
     def __unicode__(self):
         return self.name
@@ -437,19 +386,6 @@ class Districts(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class Gemellaggios(models.Model):
-    route = models.ForeignKey('Routes', db_column='route_id')
-    vclan = models.ForeignKey('Vclans', db_column='vclan_id')
-    ospitante = models.IntegerField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'gemellaggios'
-        verbose_name = 'gemellaggio'
-        verbose_name_plural = 'gemellaggi'
 
 class Periodipartecipaziones(models.Model):
     kkey = models.IntegerField(blank=True, null=True)
@@ -532,9 +468,42 @@ class RSHumen(Humen):
 
 #---------------------------------------------------------------------------------
 
-@receiver(post_save)
-def my_log_queue(sender, **kwargs):
+MODEL_RABBITMQ_MAP = {
+    Humen : 'human',
+}
 
-    instance = kwargs['instance']
-    data = serializers.serialize("json", [instance])
-    print("[DB WRITE] %s" % data)
+def get_rabbitmq_routing_key(sender, instance, created):
+
+    basename = MODEL_RABBITMQ_MAP.get(sender)
+    if basename:
+        action = ['change','insert'][int(created)]
+        return u"%s.%s" % (basename, action)
+    else:
+        return None
+
+import pika
+@receiver(post_save)
+def my_log_queue(sender, instance, created, **kwargs):
+
+    data = serializers.serialize("json", instance)
+
+    # Publish changes to RabbitMQ server
+    routing_key = get_rabbitmq_routing_key(sender, instance, created)
+
+    if routing_key:
+        #RABBITMQ_SETTINGS
+
+        RABBITMQ_connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost')
+        )
+        RABBITMQ_channel = RABBITMQ_connection.channel()
+        RABBITMQ_channel.exchange_declare(
+            exchange='ldap', type='direct'
+        )
+
+        RABBITMQ_channel.basic_publish(
+            exchange='ldap', routing_key=routing_key, body=data
+        )
+        RABBITMQ_connection.close()
+
+    print("[DB WRITE %s] %s" % (routing_key, data))

@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
-from edda.models import Humen, Chiefroles, Periodipartecipaziones
+from edda.models import Humen, Periodipartecipaziones
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 
 from django.http import HttpResponseRedirect
@@ -130,11 +130,11 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'nome',
         'cognome',
         'vclan__nome',
-        'ruolo__description',
+        'ruolo',
     ]
 
     list_filter = [
-        'ruolo__description',
+        'ruolo',
         'vclan',
     ]
 
@@ -399,7 +399,6 @@ class VclansAdmin(admin.ModelAdmin):
 admin.site.register(Humen, BaseHumenAdmin)
 #admin.site.register(RSHumen, RSAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
-admin.site.register(Chiefroles, ChiefrolesAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)
 admin.site.register(Routes, RoutesAdmin)
 
