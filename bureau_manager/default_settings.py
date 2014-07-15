@@ -123,3 +123,12 @@ LOGGING = {
 }
 
 MAX_USABLE_CODICE_CENSIMENTO = 2999
+SUIT_CONFIG = {
+    'ADMIN_NAME' : 'RN2014 - Segreteria',
+    'LIST_PER_PAGE' : 100,
+    'SEARCH_URL' : '',
+    'MENU' : (
+        {'app': 'edda', 'label': 'Gestione', },
+    ),
+    
+}
