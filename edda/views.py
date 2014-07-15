@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
@@ -9,6 +10,7 @@ def can_update_stato_di_arrivo(user):
 
     return user.is_superuser or user.groups.filter(name__in=["tesoriere","segreteria"]).count()
 
+@csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
 def vclans_do_check_in_campo(request, pk):
@@ -19,6 +21,7 @@ def vclans_do_check_in_campo(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
 def vclans_do_check_in_quartiere(request, pk):
@@ -31,6 +34,7 @@ def vclans_do_check_in_quartiere(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
 def vclans_do_set_retired_campo(request, pk):
@@ -42,6 +46,7 @@ def vclans_do_set_retired_campo(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
 def humen_do_check_in_quartiere(request, pk):
@@ -52,6 +57,7 @@ def humen_do_check_in_quartiere(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
 def humen_do_set_retired_quartiere(request, pk):
