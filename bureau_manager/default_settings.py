@@ -133,3 +133,6 @@ SUIT_CONFIG = {
     
 }
 
+RABBITMQ = {
+    'host' : 'localhost',
+}

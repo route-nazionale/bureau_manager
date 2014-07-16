@@ -138,7 +138,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'vclan',
     ]
 
-    list_per_page = 10
+    #DEBUG list_per_page = 10
 
     fieldsets = (
         (None, {
