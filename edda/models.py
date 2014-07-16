@@ -465,8 +465,17 @@ class RSHumen(Humen):
         verbose_name = 'RS'
         verbose_name_plural = 'RS'
 
+#--------------------------------------------------------------------------------
+# Extending a bit the User model
+from django.contrib.auth.models import User
+
+def user_is_readonly(self):
+    return bool(self.groups.filter(name='readonly').count())
+
+User.add_to_class('is_readonly', user_is_readonly)
 
 #---------------------------------------------------------------------------------
+# RABBITMQ part
 
 MODEL_RABBITMQ_MAP = {
     Humen : 'human',

@@ -7,43 +7,45 @@
 {% endblock %}
 
 {% block submit_buttons_bottom %}
-    {{ block.super }}
-    {% if change %}
-        {% if original.arrivato_al_campo %}
-            <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO DI TUTTI AL QUARTIERE</button>
-        {% else %}
-            <button name="_set_retired_campo" href="do-set-retired-campo/" class="btn btn-high btn-danger bureau-buttons" type="submit">RITIRA IL CLAN DALLA ROUTE</button>
-        {% endif %}
+    {% if not user.is_readonly %}
+        {{ block.super }}
+        {% if change %}
+            {% if original.arrivato_al_campo %}
+                <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO DI TUTTI AL QUARTIERE</button>
+            {% else %}
+                <button name="_set_retired_campo" href="do-set-retired-campo/" class="btn btn-high btn-danger bureau-buttons" type="submit">RITIRA IL CLAN DALLA ROUTE</button>
+            {% endif %}
 
-        <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
-        
-    <script type="text/javascript">
+            <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
+            
+        <script type="text/javascript">
 
-        $('button[name=_add_rover_o_scolta]').click(function (e) {
-            window.open('{% url "admin:edda_humen_add" %}?vclan_id={{ original.pk }}');
-            e.stopPropagation();
-            return false;
-        });
+            $('button[name=_add_rover_o_scolta]').click(function (e) {
+                window.open('{% url "admin:edda_humen_add" %}?vclan_id={{ original.pk }}');
+                e.stopPropagation();
+                return false;
+            });
 
-        $('.bureau-buttons').click(function (e) {
-            var el = $(e.target);
-            $.post(el.attr('href'), {})
-                .done(function(data) {
-                    if (data != "OK") {
+            $('.bureau-buttons').click(function (e) {
+                var el = $(e.target);
+                $.post(el.attr('href'), {})
+                    .done(function(data) {
+                        if (data != "OK") {
+                            alert("Non hai i permessi necessari per eseguire l'operazione");
+                        } else {
+                            alert('Operazione "' + el.text() + '" eseguita con successo!');
+                            $(el).remove();
+                        }
+                    })
+                    .fail(function(data) {
                         alert("Non hai i permessi necessari per eseguire l'operazione");
-                    } else {
-                        alert('Operazione "' + el.text() + '" eseguita con successo!');
-                        $(el).remove();
-                    }
-                })
-                .fail(function(data) {
-                    alert("Non hai i permessi necessari per eseguire l'operazione");
-                });
-        
-            e.stopPropagation();
-            return false;
-        });
-    </script>
+                    });
+            
+                e.stopPropagation();
+                return false;
+            });
+        </script>
+        {% endif %}
     {% endif %}
 {% endblock %}
 

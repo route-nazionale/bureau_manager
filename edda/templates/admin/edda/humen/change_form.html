@@ -2,39 +2,41 @@
 {% load i18n %}
 
 {% block submit_buttons_bottom %}
-    {{ block.super }}
-    {% if change %}
-        {% if not original.arrivato_al_quartiere and original.vclan.arrivato_al_campo %}
-            <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO</button>
-        {% elif original.arrivato_al_quartiere %}
-            <button name="_is_here" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">È QUI CON NOI IN ROUTE!</button>
-        {% endif %}
-        {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
-            <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
-        {% else %}
-            <button name="_retired" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</button>
-        {% endif %}
+    {% if not user.is_readonly %}
+        {{ block.super }}
+        {% if change %}
+            {% if not original.arrivato_al_quartiere and original.vclan.arrivato_al_campo %}
+                <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO</button>
+            {% elif original.arrivato_al_quartiere %}
+                <button name="_is_here" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">È QUI CON NOI IN ROUTE!</button>
+            {% endif %}
+            {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
+                <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
+            {% else %}
+                <button name="_retired" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</button>
+            {% endif %}
 
-    <script type="text/javascript">
-        $('.bureau-buttons').click(function (e) {
-            var el = $(e.target);
-            $.post(el.attr('href'), {})
-                .done(function(data) {
-                    if (data != "OK") {
+        <script type="text/javascript">
+            $('.bureau-buttons').click(function (e) {
+                var el = $(e.target);
+                $.post(el.attr('href'), {})
+                    .done(function(data) {
+                        if (data != "OK") {
+                            alert("Non hai i permessi necessari per eseguire l'operazione");
+                        } else {
+                            alert('Operazione "' + el.text() + '" eseguita con successo!');
+                            $(el).remove();
+                        }
+                    })
+                    .fail(function(data) {
                         alert("Non hai i permessi necessari per eseguire l'operazione");
-                    } else {
-                        alert('Operazione "' + el.text() + '" eseguita con successo!');
-                        $(el).remove();
-                    }
-                })
-                .fail(function(data) {
-                    alert("Non hai i permessi necessari per eseguire l'operazione");
-                });
-        
-            e.stopPropagation();
-            return false;
-        });
-    </script>
+                    });
+            
+                e.stopPropagation();
+                return false;
+            });
+        </script>
+        {% endif %}
     {% endif %}
 {% endblock %}
 

@@ -182,7 +182,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
             #'classes' : ('wide',),
         }),
     )
-
     actions = [
         'arrivati_al_quartiere', 
         'non_arrivati_al_quartiere',
@@ -193,12 +192,54 @@ class BaseHumenAdmin(admin.ModelAdmin):
     actions_on_bottom = True
     actions_on_top = True
 
+    # Wrap readonly permissions
+    def get_actions(self, request):
+        
+        if request.user.is_readonly():
+            actions = []
+        else:
+            actions = super(BaseHumenAdmin, self).get_actions(request)
+        return actions
+
+    def has_add_permission(self, request):
+        return not request.user.is_readonly()
+
+    #def get_form(self, request, obj):
+    #    if request.user.is_readonly():
+    #        disable_field(BaseHumenForm.classe_presenza)
+    #    form = super(BaseHumenAdmin, self).get_form(request, obj)
+
+    # End wrap readonly permissions
+
     #def add_humen(self, request, queryset):
     #    return HttpResponseRedirect("/admin/edda/humen/add/")
     #add_humen.short_description = 'Aggiungi Persona'
 
     def change_view(self, request, *args, **kw):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+
+        if request.user.is_readonly():
+            self.readonly_fields = (
+                'vclan', 'codice_censimento',
+                'scout', 'agesci',
+                'cu',  
+                'fisiche', 'lis', 'psichiche', 'sensoriali',
+                'patologie', 
+                'colazione', 'dieta_alimentare',
+                'el_intolleranze_alimentari',
+                'el_allergie_alimentari', 
+                'el_allergie_farmaci',
+                'stradadicoraggio1', 'stradadicoraggio2', 
+                'stradadicoraggio3', 'stradadicoraggio4', 
+                'stradadicoraggio5',
+                'ruolo', 'periodo_partecipazione', 'pagato', 
+                'nome', 'cognome', 'sesso', 'data_nascita',
+                'cellulare', 'email', 
+                'abitazione', 'indirizzo', 
+                'provincia', 'cap', 'citta'
+            )
+        else:
+            self.readonly_fields = ()
         
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
@@ -394,6 +435,19 @@ class VclansAdmin(admin.ModelAdmin):
             el.update_arrivo_al_quartiere(is_arrived=False)
             el.save()
     non_arrivati_al_quartiere.short_description = 'Imposta il MANCATO ARRIVO al QUARTIERE'
+
+    # Wrap readonly permissions
+    def get_actions(self, request):
+        
+        if request.user.is_readonly():
+            actions = []
+        else:
+            actions = super(VclansAdmin, self).get_actions(request)
+        return actions
+
+    def has_add_permission(self, request):
+        return not request.user.is_readonly()
+    # End wrap readonly permissions
 
 
 admin.site.register(Humen, BaseHumenAdmin)
