@@ -17,9 +17,9 @@ from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core import serializers
-
 import logging
 from django.utils.timezone import now
+from django.utils.html import format_html
 
 import logging, datetime
 
@@ -39,11 +39,11 @@ class Humen(models.Model):
     idunitagruppo = models.CharField(max_length=255, blank=True,
         verbose_name=u'ID unità gruppo', help_text='', null=True
     )
-    
+
     vclan = models.ForeignKey('Vclans', db_column='vclan_id',
         verbose_name='clan', help_text='', null=True
     )
-    
+
     # Anagrafiche --------------------------------------
 
     nome = models.CharField(max_length=255, blank=True,
@@ -82,9 +82,11 @@ class Humen(models.Model):
     citta = models.CharField(max_length=255, blank=True,
         verbose_name='citta', help_text='', null=True
     )
-   
+    note = models.TextField(blank=True,
+        verbose_name='note', help_text='', null=True)
+
     # Partecipazione -------------------------------
- 
+
     ruolo = models.CharField(max_length=32,
         verbose_name='ruolo', help_text='', blank=True
     )
@@ -97,7 +99,7 @@ class Humen(models.Model):
     #mod_pagamento_id = models.IntegerField(blank=True, null=True,
     #    verbose_name='modalità di pagamento', help_text=''
     #)
-    
+
     # Ruoli  ----------------------------
     lab = models.NullBooleanField(default=False,
         verbose_name='lab.', help_text=''
@@ -122,7 +124,7 @@ class Humen(models.Model):
         verbose_name='Extra', help_text=''
     )
 
-    # Strade di coraggio -----------------------------------    
+    # Strade di coraggio -----------------------------------
 
     stradadicoraggio1 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 1', help_text=''
@@ -139,7 +141,7 @@ class Humen(models.Model):
     stradadicoraggio5 = models.NullBooleanField(default=False,
         verbose_name='strada di coraggio 5', help_text=''
     )
-    
+
     # Alimentazione --------------------------------------------
 
     colazione = models.CharField(max_length=14, db_column='colazione',
@@ -239,7 +241,7 @@ class Humen(models.Model):
             # Check for codice_censimento. Se non esiste -> crealo automaticamente!
             if not self.codice_censimento:
                 self.assign_codice_censimento()
-                        
+
         super(Humen, self).save(*args, **kw)
 
         if created:
@@ -309,6 +311,24 @@ class Humen(models.Model):
 
         return rv
 
+    def arrivato_al_campo_display(self):
+        if self.vclan.arrivato_al_campo == True:
+            return format_html('<button type="button" class="btn btn-success">S</button>')
+        elif self.vclan.arrivato_al_campo == False:
+            return format_html('<button type="button" class="btn btn-danger">N</button>')
+        return format_html('<button type="button" class="btn btn-warning">?</button>')
+    arrivato_al_campo_display.short_description = 'VARCO0'
+    arrivato_al_campo_display.allow_tags = True
+
+    def arrivato_al_quartiere_display(self):
+        if self.arrivato_al_quartiere == True:
+            return format_html('<button type="button" class="btn btn-success">S</button>')
+        elif self.arrivato_al_quartiere == False:
+            return format_html('<button type="button" class="btn btn-danger">N</button>')
+        return format_html('<button type="button" class="btn btn-warning">?</button>')
+    arrivato_al_quartiere_display.short_description = 'VARCO1'
+    arrivato_al_quartiere_display.allow_tags = True
+
 class Vclans(models.Model):
 
     idvclan = models.CharField(max_length=255, blank=True)
@@ -325,7 +345,7 @@ class Vclans(models.Model):
 
     #route = models.ForeignKey('Routes', db_column='route_id', null=True)
     #is_ospitante = models.NullBooleanField(default=None)
-    
+
     class Meta:
         #managed = False
         db_table = 'vclans'
@@ -403,7 +423,7 @@ class Periodipartecipaziones(models.Model):
         db_table = 'periodipartecipaziones'
         verbose_name = 'periodo di partecipazione'
         verbose_name_plural = 'periodi di partecipazione'
-    
+
     def __unicode__(self):
         return u"%s - %s" % (self.ruolo, self.description)
 
