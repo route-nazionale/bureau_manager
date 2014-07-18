@@ -94,9 +94,9 @@ class Humen(models.Model):
     pagato = models.NullBooleanField(default=False,
         verbose_name='pagato', help_text=''
     )
-    mod_pagamento_id = models.IntegerField(blank=True, null=True,
-        verbose_name='modalità di pagamento', help_text=''
-    )
+    #mod_pagamento_id = models.IntegerField(blank=True, null=True,
+    #    verbose_name='modalità di pagamento', help_text=''
+    #)
     
     # Ruoli  ----------------------------
     lab = models.NullBooleanField(default=False,
@@ -314,7 +314,7 @@ class Vclans(models.Model):
     idvclan = models.CharField(max_length=255, blank=True)
     idgruppo = models.CharField(verbose_name="ID gruppo", max_length=255, blank=True)
     idunitagruppo = models.CharField(verbose_name="ID unità gruppo", max_length=255, blank=True)
-    ordinale = models.CharField(max_length=255, blank=True)
+    # ordinale = models.CharField(max_length=255, blank=True)
     nome = models.CharField(max_length=255, blank=True)
     regione = models.CharField(max_length=255, blank=True)
     updated_at = models.DateTimeField(blank=True, null=True, auto_now=True)
@@ -512,7 +512,7 @@ def my_log_queue(sender, instance, created, **kwargs):
         )
         RABBITMQ_connection.close()
 
-    print("[DB WRITE %s] %s" % (routing_key, data))
+    # print("[DB WRITE %s] %s" % (routing_key, data))
 
 
 # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
