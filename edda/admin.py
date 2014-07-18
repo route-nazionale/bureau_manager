@@ -138,6 +138,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'vclan',
     ]
 
+    base_readonly_fields = ['codice_censimento', 'cu', 'periodo_partecipazione']
+
     #DEBUG list_per_page = 10
 
     fieldsets = (
@@ -219,8 +221,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
 
         if request.user.is_readonly():
-            self.readonly_fields = (
-                'vclan', 'codice_censimento',
+            self.readonly_fields = self.base_readonly_fields + [
+                'vclan',        
                 'scout', 'agesci',
                 'cu',  
                 'fisiche', 'lis', 'psichiche', 'sensoriali',
@@ -237,9 +239,9 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 'cellulare', 'email', 
                 'abitazione', 'indirizzo', 
                 'provincia', 'cap', 'citta'
-            )
+            ]
         else:
-            self.readonly_fields = ()
+            self.readonly_fields = self.base_readonly_fields
         
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
