@@ -478,13 +478,13 @@ User.add_to_class('is_readonly', user_is_readonly)
 # RABBITMQ part
 
 MODEL_RABBITMQ_MAP = {
-    Humen : 'human',
+    Humen : ('human', lambda x: x.cu not in ['', None])
 }
 
 def get_rabbitmq_routing_key(sender, instance, created):
 
-    basename = MODEL_RABBITMQ_MAP.get(sender)
-    if basename:
+    basename, condition = MODEL_RABBITMQ_MAP.get(sender)
+    if basename and condition(instance):
         action = ['update','insert'][int(created)]
         return u"%s.%s" % (basename, action)
     else:
