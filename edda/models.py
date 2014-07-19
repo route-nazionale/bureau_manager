@@ -513,7 +513,7 @@ User.add_to_class('is_readonly', user_is_readonly)
 # RABBITMQ part
 
 MODEL_RABBITMQ_MAP = {
-    Humen : ('human', lambda x: x.cu not in ['', None])
+    Humen : ('humen', lambda x: x.cu not in ['', None])
 }
 
 def get_rabbitmq_routing_key(sender, instance, created):
@@ -531,7 +531,6 @@ def my_log_queue(sender, instance, created, **kwargs):
 
     data = serializers.serialize("json", [instance])
 
-"""
     # Publish changes to RabbitMQ server
     routing_key = get_rabbitmq_routing_key(sender, instance, created)
 
@@ -548,8 +547,7 @@ def my_log_queue(sender, instance, created, **kwargs):
         )
         RABBITMQ_connection.close()
 
-    # print("[DB WRITE %s] %s" % (routing_key, data))
-"""
+        logger.debug("[DB WRITE %s] %s" % (routing_key, data))
 
 
 # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
