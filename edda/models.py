@@ -313,19 +313,23 @@ class Humen(models.Model):
 
     def arrivato_al_campo_display(self):
         if self.vclan.arrivato_al_campo == True:
-            return format_html('<button type="button" class="btn btn-success">S</button>')
+            css, button = 'success', 'S'
         elif self.vclan.arrivato_al_campo == False:
-            return format_html('<button type="button" class="btn btn-danger">N</button>')
-        return format_html('<button type="button" class="btn btn-warning">?</button>')
+            css, button = 'danger', 'N'
+        else:
+            css, button = 'warning', '?'
+        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
     def arrivato_al_quartiere_display(self):
         if self.arrivato_al_quartiere == True:
-            return format_html('<button type="button" class="btn btn-success">S</button>')
+            css, button = 'success', 'S'
         elif self.arrivato_al_quartiere == False:
-            return format_html('<button type="button" class="btn btn-danger">N</button>')
-        return format_html('<button type="button" class="btn btn-warning">?</button>')
+            css, button = 'danger', 'N'
+        else:
+            css, button = 'warning', '?'
+        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
     arrivato_al_quartiere_display.short_description = 'VARCO1'
     arrivato_al_quartiere_display.allow_tags = True
 
@@ -516,6 +520,7 @@ def my_log_queue(sender, instance, created, **kwargs):
 
     data = serializers.serialize("json", [instance])
 
+"""
     # Publish changes to RabbitMQ server
     routing_key = get_rabbitmq_routing_key(sender, instance, created)
 
@@ -533,6 +538,7 @@ def my_log_queue(sender, instance, created, **kwargs):
         RABBITMQ_connection.close()
 
     # print("[DB WRITE %s] %s" % (routing_key, data))
+"""
 
 
 # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
