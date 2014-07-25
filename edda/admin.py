@@ -37,7 +37,7 @@ class ReadOnlyForm(forms.ModelForm):
         super(ReadOnlyForm, self).__init__(*args, **kw)
         for v in self.fields.values():
             disable_field(v)
-        
+
     def clean(self):
 
         cleaned_data = super(ReadOnlyForm, self).clean()
@@ -45,7 +45,7 @@ class ReadOnlyForm(forms.ModelForm):
             for k,v in self.fields.items():
                 cleaned_data[k] = getattr(self.instance, k)
         return cleaned_data
-    
+
 #--------------------------------------------------------------------------------
 
 
@@ -106,7 +106,7 @@ class BaseHumenForm(forms.ModelForm):
 
     #class Meta:
     #    model = Humen
-    
+
 
 class BaseHumenAdmin(admin.ModelAdmin):
 
@@ -115,6 +115,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     list_display = [
         '__unicode__',
+        'arrivato_al_campo_display',
+        'arrivato_al_quartiere_display',
         'ruolo',
         'vclan',
         'cu',
@@ -146,21 +148,21 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('vclan', 'codice_censimento'),
-                ('scout', 'agesci', 'classe_presenza'),  
-                ('cu',),  
+                ('scout', 'agesci', 'classe_presenza'),
+                ('cu',),
             ),
             'classes' : ('wide',)
         }),
         ('Anagrafica', {
             'fields': (
-                ('nome', 'cognome'), ('sesso', 'data_nascita'),  
-                ('cellulare', 'email'), 
+                ('nome', 'cognome'), ('sesso', 'data_nascita'),
+                ('cellulare', 'email'),
                 ('abitazione', 'indirizzo', 'provincia', 'cap', 'citta'),
             )
         }),
         ('Partecipazione', {
             'fields': (
-                'ruolo', 'periodo_partecipazione', ('pagato'), 
+                'ruolo', 'periodo_partecipazione', ('pagato'),
             )
         }),
         ('Strade di coraggio', {
@@ -170,22 +172,22 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
         ('Alimentazione', {
             'fields': (
-                ('colazione', 'dieta_alimentare'), 
+                ('colazione', 'dieta_alimentare'),
                 'el_intolleranze_alimentari',
-                'el_allergie_alimentari', 
+                'el_allergie_alimentari',
                 'el_allergie_farmaci',
             )
         }),
         ('Diversamente abili', {
             'fields': (
                 ('fisiche', 'lis', 'psichiche', 'sensoriali'),
-                'patologie', 
+                'patologie',
             ),
             #'classes' : ('wide',),
         }),
     )
     actions = [
-        'arrivati_al_quartiere', 
+        'arrivati_al_quartiere',
         'non_arrivati_al_quartiere',
         #'imposta_ritirati',
     ]
@@ -196,7 +198,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     # Wrap readonly permissions
     def get_actions(self, request):
-        
+
         if request.user.is_readonly():
             actions = []
         else:
@@ -222,32 +224,31 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
         if request.user.is_readonly():
             self.readonly_fields = self.base_readonly_fields + [
-                'vclan',        
+                'vclan',
                 'scout', 'agesci',
-                'cu',  
+                'cu',
                 'fisiche', 'lis', 'psichiche', 'sensoriali',
-                'patologie', 
+                'patologie',
                 'colazione', 'dieta_alimentare',
                 'el_intolleranze_alimentari',
-                'el_allergie_alimentari', 
+                'el_allergie_alimentari',
                 'el_allergie_farmaci',
-                'stradadicoraggio1', 'stradadicoraggio2', 
-                'stradadicoraggio3', 'stradadicoraggio4', 
+                'stradadicoraggio1', 'stradadicoraggio2',
+                'stradadicoraggio3', 'stradadicoraggio4',
                 'stradadicoraggio5',
-                'ruolo', 'periodo_partecipazione', 'pagato', 
+                'ruolo', 'periodo_partecipazione', 'pagato',
                 'nome', 'cognome', 'sesso', 'data_nascita',
-                'cellulare', 'email', 
-                'abitazione', 'indirizzo', 
+                'cellulare', 'email',
+                'abitazione', 'indirizzo',
                 'provincia', 'cap', 'citta'
             ]
         else:
             self.readonly_fields = self.base_readonly_fields
-        
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
     def add_view(self, request, *args, **kw):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
-        
+
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
     def arrivati_al_quartiere(self, request, queryset):
@@ -289,7 +290,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
     my_class.short_description = 'classe'
 
     def save_model(self, request, obj, form, changed):
-        
+
         obj.rs = form.cleaned_data['classe_presenza'] == 'RS'
         obj.capo = form.cleaned_data['classe_presenza'] == 'CA'
         obj.extra = form.cleaned_data['classe_presenza'] == 'EX'
@@ -316,7 +317,7 @@ class ChiefAdmin(BaseHumenAdmin):
     pass
 
 class ChiefrolesAdmin(admin.ModelAdmin):
-    
+
     list_display = (
         'description',
     )
@@ -325,7 +326,7 @@ class PeriodipartecipazionesAdmin(admin.ModelAdmin):
     list_display = (
         '__unicode__',
     )
-    
+
 class RoutesAdmin(admin.ModelAdmin):
     list_display = (
         '__unicode__', 'numero', 'area', 'quartiere',
@@ -340,10 +341,10 @@ class HumenInline(admin.TabularInline):
     model = Humen
     #template = "admin/vclans/inline_person.html"
     fields = (
-        'nowrap__unicode__', 'ruolo', 'handicaps',
+        'nowrap__unicode__', 'arrivato_al_quartiere_display', 'ruolo', 'handicaps',
         'periodo_partecipazione',
     )
-    readonly_fields = ('nowrap__unicode__', 'handicaps', 'ruolo', 'periodo_partecipazione')
+    readonly_fields = ('nowrap__unicode__', 'arrivato_al_quartiere_display', 'handicaps', 'ruolo', 'periodo_partecipazione')
     extra = 0
 
     def handicaps(self, obj):
@@ -383,7 +384,7 @@ class VclansAdmin(admin.ModelAdmin):
     ]
 
     actions = [
-        'arrivati_al_campo', 
+        'arrivati_al_campo',
         'non_arrivati_al_campo',
         'arrivati_al_quartiere',
         'non_arrivati_al_quartiere',
@@ -395,7 +396,7 @@ class VclansAdmin(admin.ModelAdmin):
     save_on_top = True
 
     list_display = (
-        '__unicode__', 'nome', 'idunitagruppo', 'idgruppo'
+        '__unicode__', 'arrivato_al_campo_display', 'nome', 'idunitagruppo', 'idgruppo'
     )
 
     fieldsets = (
@@ -415,7 +416,7 @@ class VclansAdmin(admin.ModelAdmin):
         el.update_arrivo_al_campo(is_arrived=True)
         el.save()
     arrivati_al_campo.short_description = 'Imposta arrivo al CAMPO'
-    
+
 
     @only_one_element_allowed
     def non_arrivati_al_campo(self, request, queryset):
@@ -440,7 +441,7 @@ class VclansAdmin(admin.ModelAdmin):
 
     # Wrap readonly permissions
     def get_actions(self, request):
-        
+
         if request.user.is_readonly():
             actions = []
         else:
