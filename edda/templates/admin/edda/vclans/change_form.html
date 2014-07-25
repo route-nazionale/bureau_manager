@@ -13,6 +13,7 @@
             {% if original.arrivato_al_campo %}
                 <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO DI TUTTI AL QUARTIERE</button>
             {% else %}
+                <button name="_set_arrived_campo" href="do-check-in-campo/" class="btn btn-high btn-info bureau-buttons" type="submit">SEGNA IL CLAN COME ARRIVATO AL CAMPO</button>
                 <button name="_set_retired_campo" href="do-set-retired-campo/" class="btn btn-high btn-danger bureau-buttons" type="submit">RITIRA IL CLAN DALLA ROUTE</button>
             {% endif %}
 
@@ -34,7 +35,7 @@
                             alert("Non hai i permessi necessari per eseguire l'operazione");
                         } else {
                             alert('Operazione "' + el.text() + '" eseguita con successo!');
-                            $(el).remove();
+                            window.location.reload();
                         }
                     })
                     .fail(function(data) {

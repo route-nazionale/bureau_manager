@@ -8,7 +8,7 @@ from edda.models import Vclans, Humen
 
 def can_update_stato_di_arrivo(user):
 
-    return user.is_superuser or user.groups.filter(name__in=["tesoriere","segreteria"]).count()
+    return user.is_superuser or user.groups.filter(name__in=["tesorieri","segreteria"]).count()
 
 @csrf_exempt
 @require_POST

@@ -403,12 +403,12 @@ class VclansAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 ('nome', 'idunitagruppo', 'idgruppo',
-                'regione',)
+                'regione', 'arrivato_al_campo_display',)
             )
         }),
     )
 
-    readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione')
+    readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione', 'arrivato_al_campo_display',)
 
     @only_one_element_allowed
     def arrivati_al_campo(self, request, queryset):
