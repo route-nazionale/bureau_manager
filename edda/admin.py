@@ -341,10 +341,10 @@ class HumenInline(admin.TabularInline):
     model = Humen
     #template = "admin/vclans/inline_person.html"
     fields = (
-        'nowrap__unicode__', 'ruolo', 'handicaps',
+        'nowrap__unicode__', 'arrivato_al_quartiere_display', 'ruolo', 'handicaps',
         'periodo_partecipazione',
     )
-    readonly_fields = ('nowrap__unicode__', 'handicaps', 'ruolo', 'periodo_partecipazione')
+    readonly_fields = ('nowrap__unicode__', 'arrivato_al_quartiere_display', 'handicaps', 'ruolo', 'periodo_partecipazione')
     extra = 0
 
     def handicaps(self, obj):
