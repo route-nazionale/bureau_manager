@@ -374,6 +374,17 @@ class Vclans(models.Model):
             h.update_arrivo_al_quartiere(is_arrived)
             h.save()
 
+    def arrivato_al_campo_display(self):
+        if self.arrivato_al_campo == True:
+            css, button = 'success', 'S'
+        elif self.arrivato_al_campo == False:
+            css, button = 'danger', 'N'
+        else:
+            css, button = 'warning', '?'
+        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
+    arrivato_al_campo_display.short_description = 'VARCO0'
+    arrivato_al_campo_display.allow_tags = True
+
 class Contradas(models.Model):
     numero = models.IntegerField(blank=True, null=True)
     district_id = models.IntegerField(blank=True, null=True)

@@ -396,7 +396,7 @@ class VclansAdmin(admin.ModelAdmin):
     save_on_top = True
 
     list_display = (
-        '__unicode__', 'nome', 'idunitagruppo', 'idgruppo'
+        '__unicode__', 'arrivato_al_campo_display', 'nome', 'idunitagruppo', 'idgruppo'
     )
 
     fieldsets = (
