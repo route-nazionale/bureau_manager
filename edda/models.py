@@ -512,55 +512,57 @@ User.add_to_class('is_readonly', user_is_readonly)
 #---------------------------------------------------------------------------------
 # RABBITMQ part
 
-MODEL_RABBITMQ_MAP = {
-    Humen : ('humen', lambda x: x.cu not in ['', None])
-}
+if settings.RABBITMQ_ENABLE:
 
-def get_rabbitmq_routing_key(sender, instance, created):
+    MODEL_RABBITMQ_MAP = {
+        Humen : ('humen', lambda x: x.cu not in ['', None])
+    }
 
-    basename, condition = MODEL_RABBITMQ_MAP.get(sender)
-    if basename and condition(instance):
-        action = ['update','insert'][int(created)]
-        return u"%s.%s" % (basename, action)
-    else:
-        return None
+    def get_rabbitmq_routing_key(sender, instance, created):
 
-import pika
-@receiver(post_save)
-def my_log_queue(sender, instance, created, **kwargs):
+        basename, condition = MODEL_RABBITMQ_MAP.get(sender, (None, None))
+        if basename and condition(instance):
+            action = ['update','insert'][int(created)]
+            return u"%s.%s" % (basename, action)
+        else:
+            return None
 
-    data = serializers.serialize("json", [instance])
+    import pika
+    @receiver(post_save)
+    def my_log_queue(sender, instance, created, **kwargs):
 
-    # Publish changes to RabbitMQ server
-    routing_key = get_rabbitmq_routing_key(sender, instance, created)
+        data = serializers.serialize("json", [instance])
 
-    if routing_key:
-        #RABBITMQ_SETTINGS
+        # Publish changes to RabbitMQ server
+        routing_key = get_rabbitmq_routing_key(sender, instance, created)
 
-        RABBITMQ_connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**settings.RABBITMQ)
-        )
-        RABBITMQ_channel = RABBITMQ_connection.channel()
+        if routing_key:
+            #RABBITMQ_SETTINGS
 
-        RABBITMQ_channel.basic_publish(
-            exchange='application', routing_key=routing_key, body=data
-        )
-        RABBITMQ_connection.close()
+            RABBITMQ_connection = pika.BlockingConnection(
+                pika.ConnectionParameters(**settings.RABBITMQ)
+            )
+            RABBITMQ_channel = RABBITMQ_connection.channel()
 
-        logger.debug("[DB WRITE %s] %s" % (routing_key, data))
+            RABBITMQ_channel.basic_publish(
+                exchange='application', routing_key=routing_key, body=data
+            )
+            RABBITMQ_connection.close()
+
+            logger.debug("[DB WRITE %s] %s" % (routing_key, data))
 
 
-# STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
-# RABBITMQ_connection = pika.BlockingConnection(
-#     pika.ConnectionParameters(**settings.RABBITMQ)
-# )
-# RABBITMQ_channel = RABBITMQ_connection.channel()
-# routing_key = 'humen.update'
-# data='ciao mondo'
-# RABBITMQ_channel.exchange_declare(
-#     exchange='application', type='direct'
-# )
-# RABBITMQ_channel.basic_publish(
-#     exchange='application', routing_key=routing_key, body=data
-# )
-# RABBITMQ_connection.close()
+    # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
+    # RABBITMQ_connection = pika.BlockingConnection(
+    #     pika.ConnectionParameters(**settings.RABBITMQ)
+    # )
+    # RABBITMQ_channel = RABBITMQ_connection.channel()
+    # routing_key = 'humen.update'
+    # data='ciao mondo'
+    # RABBITMQ_channel.exchange_declare(
+    #     exchange='application', type='direct'
+    # )
+    # RABBITMQ_channel.basic_publish(
+    #     exchange='application', routing_key=routing_key, body=data
+    # )
+    # RABBITMQ_connection.close()

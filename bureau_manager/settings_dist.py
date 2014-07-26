@@ -28,6 +28,7 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 
+RABBITMQ_ENABLE = False
 RABBITMQ = {
     'host' : 'localhost',
 }
