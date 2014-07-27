@@ -318,7 +318,7 @@ class Humen(models.Model):
             css, button = 'danger', 'N'
         else:
             css, button = 'warning', '?'
-        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
+        return format_html('<span class="label label-%s">%s</span>' % (css, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
@@ -329,7 +329,7 @@ class Humen(models.Model):
             css, button = 'danger', 'N'
         else:
             css, button = 'warning', '?'
-        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
+        return format_html('<span class="label label-%s">%s</span>' % (css, button))
     arrivato_al_quartiere_display.short_description = 'VARCO1'
     arrivato_al_quartiere_display.allow_tags = True
 
@@ -381,7 +381,7 @@ class Vclans(models.Model):
             css, button = 'danger', 'N'
         else:
             css, button = 'warning', '?'
-        return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
+        return format_html('<span class="label label-%s">%s</span>' % (css, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
