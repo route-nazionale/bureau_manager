@@ -589,7 +589,7 @@ if settings.RABBITMQ_ENABLE:
 
         basename, condition = MODEL_RABBITMQ_MAP.get(sender, (None, None))
         if basename and condition(instance):
-            action = ['update','insert'][int(created) or getattr(self,'nuovo_cu',None)]
+            action = ['update','insert'][int(created) or getattr(instance,'nuovo_cu',None)]
             return u"%s.%s" % (basename, action)
         else:
             return None
