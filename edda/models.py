@@ -25,6 +25,20 @@ import logging, datetime
 
 logger = logging.getLogger(__name__)
 
+class Ruolipartecipante(models.Model):
+
+    value = models.CharField(max_length=25)
+
+    class Meta:
+        managed = False
+        db_table = 'ruolipartecipante'
+
+    def __unicode__(self):
+        return self.value
+
+#--------------------------------------------------------------------------------
+
+
 class Humen(models.Model):
 
     cu = models.CharField(max_length=255, blank=True,
@@ -87,8 +101,8 @@ class Humen(models.Model):
 
     # Partecipazione -------------------------------
 
-    ruolo = models.CharField(max_length=32,
-        verbose_name='ruolo', help_text='', blank=True
+    ruolo = models.ForeignKey(Ruolipartecipante,
+        verbose_name='ruolo', help_text='', blank=True, db_column="ruolo"
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text='', null=True
