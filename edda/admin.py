@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
-from edda.models import Humen, Periodipartecipaziones
+from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 
 from django.http import HttpResponseRedirect
@@ -455,8 +455,14 @@ class VclansAdmin(admin.ModelAdmin):
         return not request.user.is_readonly()
     # End wrap readonly permissions
 
+class HumenSostituzioniAdmin(admin.ModelAdmin):
+
+    list_display = ('humen', 'humen_sostituito_da', 'updated_at')
+    list_filter = ('humen__vclan',)
+
 
 admin.site.register(Humen, BaseHumenAdmin)
+admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)
 #admin.site.register(RSHumen, RSAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)

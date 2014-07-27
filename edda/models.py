@@ -11,7 +11,8 @@
 # into your database.
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.conf import settings
 
 from django.db.models.signals import post_save, pre_save
@@ -42,7 +43,7 @@ class Ruolipartecipante(models.Model):
 class Humen(models.Model):
 
     cu = models.CharField(max_length=255, blank=True,
-        verbose_name='codice unico', help_text='', null=True
+        verbose_name='codice unico', help_text='', null=True, unique=True
     )
     codice_censimento = models.IntegerField(blank=True, null=True,
         verbose_name='codice censimento', help_text=''
@@ -398,6 +399,40 @@ class Vclans(models.Model):
         return format_html('<button type="button" class="btn btn-%s">%s</button>' % (css, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
+
+
+def sostituzione_same_vclan():
+    return { 'vclan' : F('humen__vclan') }
+
+class HumenSostituzioni(models.Model):
+
+    humen = models.ForeignKey(Humen, to_field="cu", primary_key=True, db_column="cu", related_name="sostituito_da_set")
+    humen_sostituito_da = models.ForeignKey(Humen, to_field="cu", 
+        db_column="cu_sotituito_da", related_name="substituisce_da_set",
+        #db_column="cu_sostituito_da", related_name="substituisce_da_set",
+        limit_choices_to=sostituzione_same_vclan, null=True
+        
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'humen_sostituzioni'
+        verbose_name = 'sostituzione'
+        verbose_name_plural = 'sostituzioni'
+
+    def __unicode__(self):
+        return u"%s sostituito da %s" % (self.humen, self.humen_sostituito_da)
+
+    @transaction.atomic
+    def save(self, *args, **kw):
+        super(HumenSostituzioni, self).save(*args, **kw)
+        if self.humen.arrivato_al_quartiere is not False: # in [None, True]
+            self.humen.arrivato_al_quartiere = False
+            self.humen.save()
+
+#--------------------------------------------------------------------------------
+
 
 class Contradas(models.Model):
     numero = models.IntegerField(blank=True, null=True)
