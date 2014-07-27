@@ -477,6 +477,11 @@ class HumenSostituzioniAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser or bool(
+            request.user.groups.filter(name__in=['segreteria','tesorieri']).count()
+        )
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "humen_sostituito_da":
             kwargs["queryset"] = Humen.objects.filter(vclan=self._obj.humen.vclan).exclude(cu=self._obj.humen.cu)
