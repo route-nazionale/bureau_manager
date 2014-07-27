@@ -457,9 +457,35 @@ class VclansAdmin(admin.ModelAdmin):
 
 class HumenSostituzioniAdmin(admin.ModelAdmin):
 
-    list_display = ('humen', 'humen_sostituito_da', 'updated_at')
+    list_display = ('__unicode__', 'vclan', 'humen', 'humen_sostituito_da', 'updated_at')
     list_filter = ('humen__vclan',)
 
+    fields = ('humen', 'humen_sostituito_da', 'updated_at')
+    readonly_fields = ('humen', 'updated_at')
+
+    actions_on_top = True
+
+    # Wrap readonly permissions
+    def get_actions(self, request):
+
+        if request.user.is_readonly():
+            actions = []
+        else:
+            actions = super(HumenSostituzioniAdmin, self).get_actions(request)
+        return actions
+
+    def has_add_permission(self, request):
+        return False
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "humen_sostituito_da":
+            kwargs["queryset"] = Humen.objects.filter(vclan=self._obj.humen.vclan).exclude(cu=self._obj.humen.cu)
+        return super(HumenSostituzioniAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_form(self, request, obj=None, **kwargs):
+        self._obj = obj
+        form_class = super(HumenSostituzioniAdmin, self).get_form(request, obj, **kwargs)
+        return form_class
 
 admin.site.register(Humen, BaseHumenAdmin)
 admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)

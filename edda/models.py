@@ -305,7 +305,10 @@ class Humen(models.Model):
         return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
 
     def compute_age(self):
-        return datetime.date.today().year - self.data_nascita.year
+        if self.data_nascita:
+            return datetime.date.today().year - self.data_nascita.year
+        else:
+            return None
 
     def is_young(self):
 
@@ -401,19 +404,21 @@ class Vclans(models.Model):
     arrivato_al_campo_display.allow_tags = True
 
 
-def sostituzione_same_vclan():
-    return { 'vclan' : F('humen__vclan') }
-
 class HumenSostituzioni(models.Model):
 
-    humen = models.ForeignKey(Humen, to_field="cu", primary_key=True, db_column="cu", related_name="sostituito_da_set")
+    humen = models.ForeignKey(Humen, to_field="cu", 
+        primary_key=True, db_column="cu", related_name="sostituito_da_set",
+        verbose_name="persona"
+    )
     humen_sostituito_da = models.ForeignKey(Humen, to_field="cu", 
-        db_column="cu_sotituito_da", related_name="substituisce_da_set",
-        #db_column="cu_sostituito_da", related_name="substituisce_da_set",
-        limit_choices_to=sostituzione_same_vclan, null=True
+        db_column="cu_sostituito_da", related_name="substituisce_da_set",
+        verbose_name="sostituito da",
+        null=True
         
     )
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        verbose_name='ultimo aggiornamento', help_text='', auto_now=True
+    )
 
     class Meta:
         managed = False
@@ -423,6 +428,10 @@ class HumenSostituzioni(models.Model):
 
     def __unicode__(self):
         return u"%s sostituito da %s" % (self.humen, self.humen_sostituito_da)
+
+    @property
+    def vclan(self):
+        return self.humen.vclan
 
     @transaction.atomic
     def save(self, *args, **kw):
