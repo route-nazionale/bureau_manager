@@ -82,3 +82,26 @@ def humen_do_prepare_substitution(request, pk):
         { 'url' : reverse('admin:edda_humensostituzioni_change', args=(x.pk,))}
     )
 
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def vclan_do_set_null_arrived_campo(request, pk):
+
+    vclan = get_object_or_404(Vclans, pk=pk)
+    vclan.update_arrivo_al_campo(None)
+    vclan.save()
+
+    return HttpResponse("OK")
+
+
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def humen_do_set_null_arrived_quartiere(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+    hu.update_arrivo_al_quartiere(None)
+    hu.save()
+
+    return HttpResponse("OK")
+

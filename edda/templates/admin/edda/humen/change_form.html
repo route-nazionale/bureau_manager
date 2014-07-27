@@ -17,6 +17,10 @@
                 <label name="_retired" class="btn" disabled="disabled" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</label>
             {% endif %}
 
+            {% if original.arrivato_al_quartiere != None %}
+                <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO SCONOSCIUTO (ripristina valore iniziale)</button>
+            {% endif %}
+
         <script type="text/javascript">
             $('button[name=_set_substitution]').click(function (e) {
                 var el = $(e.target);
@@ -39,8 +43,8 @@
                         if (data != "OK") {
                             alert("Non hai i permessi necessari per eseguire l'operazione");
                         } else {
-                            alert('Operazione "' + el.text() + '" eseguita con successo!');
-                            $(el).remove();
+                            alert('Operazione "' + el.text() + '" eseguita con successo! Attendere che la pagina si ricarichi...');
+                            window.location.reload();
                         }
                     })
                     .fail(function(data) {
