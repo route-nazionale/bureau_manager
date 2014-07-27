@@ -103,7 +103,7 @@ class Humen(models.Model):
     # Partecipazione -------------------------------
 
     ruolo = models.ForeignKey(Ruolipartecipante,
-        verbose_name='ruolo', help_text='', blank=True, db_column="ruolo"
+        verbose_name='ruolo', help_text='', db_column="ruolo"
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text='', null=True
@@ -234,6 +234,7 @@ class Humen(models.Model):
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
 
         self.eta = self.compute_age()
+        self.nuovo_cu = False
 
         if self.pk: #we are updating an instance
 
@@ -256,6 +257,13 @@ class Humen(models.Model):
             # Check for codice_censimento. Se non esiste -> crealo automaticamente!
             if not self.codice_censimento:
                 self.assign_codice_censimento()
+            self.cu = ''
+            if self.vclan:
+                self.idunitagruppo = self.vclan.idunitagruppo
+                self.idgruppo = self.vclan.idgruppo
+            else:
+                self.idunitagruppo = ''
+                self.idgruppo = ''
 
         super(Humen, self).save(*args, **kw)
 
@@ -263,6 +271,7 @@ class Humen(models.Model):
             # compute codice unico (cu)
             self.cu = self.compute_cu()
             kw.pop('force_insert', None)
+            self.nuovo_cu = True
             super(Humen, self).save(*args, **kw)
 
     def assign_codice_censimento(self):
@@ -580,7 +589,7 @@ if settings.RABBITMQ_ENABLE:
 
         basename, condition = MODEL_RABBITMQ_MAP.get(sender, (None, None))
         if basename and condition(instance):
-            action = ['update','insert'][int(created)]
+            action = ['update','insert'][int(created) or getattr(self,'nuovo_cu',None)]
             return u"%s.%s" % (basename, action)
         else:
             return None
@@ -589,7 +598,7 @@ if settings.RABBITMQ_ENABLE:
     @receiver(post_save)
     def my_log_queue(sender, instance, created, **kwargs):
 
-        data = serializers.serialize("json", [instance])
+        data = serializers.serialize("json", [instance], indent=2)
 
         # Publish changes to RabbitMQ server
         routing_key = get_rabbitmq_routing_key(sender, instance, created)
@@ -608,6 +617,8 @@ if settings.RABBITMQ_ENABLE:
             RABBITMQ_connection.close()
 
             logger.debug("[DB WRITE %s] %s" % (routing_key, data))
+        else:
+            logger.debug("[NO RABBIT DB WRITE] %s" % data)
 
 
     # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
