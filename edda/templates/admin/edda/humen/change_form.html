@@ -12,11 +12,30 @@
             {% endif %}
             {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
                 <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
+                <button name="_set_substitution" href="do-prepare-substitution/" class="btn btn-high btn-danger" type="submit">SOSTITUISCI QUESTA PERSONA</button>
             {% else %}
-                <button name="_retired" class="btn" disabled="disabled" type="submit" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</button>
+                <label name="_retired" class="btn" disabled="disabled" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</label>
+            {% endif %}
+
+            {% if original.arrivato_al_quartiere != None and not original.sostituito_da_set.count %}
+                <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO SCONOSCIUTO (ripristina valore iniziale)</button>
             {% endif %}
 
         <script type="text/javascript">
+            $('button[name=_set_substitution]').click(function (e) {
+                var el = $(e.target);
+                $.post(el.attr('href'), {})
+                    .done(function(data) {
+                        if (data.url !== undefined) {
+                            window.location.href = data.url;
+                        }
+                        else
+                            alert("Ritorno inaspettato: " + data)
+                    });
+                e.stopPropagation();
+                return false;
+            });
+
             $('.bureau-buttons').click(function (e) {
                 var el = $(e.target);
                 $.post(el.attr('href'), {})
@@ -24,8 +43,8 @@
                         if (data != "OK") {
                             alert("Non hai i permessi necessari per eseguire l'operazione");
                         } else {
-                            alert('Operazione "' + el.text() + '" eseguita con successo!');
-                            $(el).remove();
+                            alert('Operazione "' + el.text() + '" eseguita con successo! Attendere che la pagina si ricarichi...');
+                            window.location.reload();
                         }
                     })
                     .fail(function(data) {

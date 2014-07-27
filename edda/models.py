@@ -11,7 +11,8 @@
 # into your database.
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.conf import settings
 
 from django.db.models.signals import post_save, pre_save
@@ -25,10 +26,24 @@ import logging, datetime
 
 logger = logging.getLogger(__name__)
 
+class Ruolipartecipante(models.Model):
+
+    value = models.CharField(max_length=25)
+
+    class Meta:
+        managed = False
+        db_table = 'ruolipartecipante'
+
+    def __unicode__(self):
+        return self.value
+
+#--------------------------------------------------------------------------------
+
+
 class Humen(models.Model):
 
     cu = models.CharField(max_length=255, blank=True,
-        verbose_name='codice unico', help_text='', null=True
+        verbose_name='codice unico', help_text='', null=True, unique=True
     )
     codice_censimento = models.IntegerField(blank=True, null=True,
         verbose_name='codice censimento', help_text=''
@@ -87,8 +102,8 @@ class Humen(models.Model):
 
     # Partecipazione -------------------------------
 
-    ruolo = models.CharField(max_length=32,
-        verbose_name='ruolo', help_text='', blank=True
+    ruolo = models.ForeignKey(Ruolipartecipante,
+        verbose_name='ruolo', help_text='', db_column="ruolo"
     )
     periodo_partecipazione = models.ForeignKey('Periodipartecipaziones', db_column='periodo_partecipazione_id',
         verbose_name='periodo di partecipazione', help_text='', null=True
@@ -219,6 +234,7 @@ class Humen(models.Model):
         self.allergie_farmaci = bool(self.el_allergie_farmaci)
 
         self.eta = self.compute_age()
+        self.nuovo_cu = False
 
         if self.pk: #we are updating an instance
 
@@ -241,6 +257,13 @@ class Humen(models.Model):
             # Check for codice_censimento. Se non esiste -> crealo automaticamente!
             if not self.codice_censimento:
                 self.assign_codice_censimento()
+            self.cu = ''
+            if self.vclan:
+                self.idunitagruppo = self.vclan.idunitagruppo
+                self.idgruppo = self.vclan.idgruppo
+            else:
+                self.idunitagruppo = ''
+                self.idgruppo = ''
 
         super(Humen, self).save(*args, **kw)
 
@@ -248,6 +271,7 @@ class Humen(models.Model):
             # compute codice unico (cu)
             self.cu = self.compute_cu()
             kw.pop('force_insert', None)
+            self.nuovo_cu = True
             super(Humen, self).save(*args, **kw)
 
     def assign_codice_censimento(self):
@@ -290,7 +314,10 @@ class Humen(models.Model):
         return "%s-%04d-%06d" % (base_cu, self.vclan_id, self.pk )
 
     def compute_age(self):
-        return datetime.date.today().year - self.data_nascita.year
+        if self.data_nascita:
+            return datetime.date.today().year - self.data_nascita.year
+        else:
+            return None
 
     def is_young(self):
 
@@ -384,6 +411,46 @@ class Vclans(models.Model):
         return format_html('<span class="label label-%s">%s</span>' % (css, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
+
+
+class HumenSostituzioni(models.Model):
+
+    humen = models.ForeignKey(Humen, to_field="cu", 
+        primary_key=True, db_column="cu", related_name="sostituito_da_set",
+        verbose_name="persona"
+    )
+    humen_sostituito_da = models.ForeignKey(Humen, to_field="cu", 
+        db_column="cu_sostituito_da", related_name="substituisce_da_set",
+        verbose_name="sostituito da",
+        null=True
+        
+    )
+    updated_at = models.DateTimeField(
+        verbose_name='ultimo aggiornamento', help_text='', auto_now=True
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'humen_sostituzioni'
+        verbose_name = 'sostituzione'
+        verbose_name_plural = 'sostituzioni'
+
+    def __unicode__(self):
+        return u"%s sostituito da %s" % (self.humen, self.humen_sostituito_da)
+
+    @property
+    def vclan(self):
+        return self.humen.vclan
+
+    @transaction.atomic
+    def save(self, *args, **kw):
+        super(HumenSostituzioni, self).save(*args, **kw)
+        if self.humen.arrivato_al_quartiere is not False: # in [None, True]
+            self.humen.arrivato_al_quartiere = False
+            self.humen.save()
+
+#--------------------------------------------------------------------------------
+
 
 class Contradas(models.Model):
     numero = models.IntegerField(blank=True, null=True)
@@ -512,57 +579,59 @@ User.add_to_class('is_readonly', user_is_readonly)
 #---------------------------------------------------------------------------------
 # RABBITMQ part
 
-MODEL_RABBITMQ_MAP = {
-    Humen : ('human', lambda x: x.cu not in ['', None])
-}
+if settings.RABBITMQ_ENABLE:
 
-def get_rabbitmq_routing_key(sender, instance, created):
+    MODEL_RABBITMQ_MAP = {
+        Humen : ('humen', lambda x: x.cu not in ['', None])
+    }
 
-    basename, condition = MODEL_RABBITMQ_MAP.get(sender)
-    if basename and condition(instance):
-        action = ['update','insert'][int(created)]
-        return u"%s.%s" % (basename, action)
-    else:
-        return None
+    def get_rabbitmq_routing_key(sender, instance, created):
 
-import pika
-@receiver(post_save)
-def my_log_queue(sender, instance, created, **kwargs):
+        basename, condition = MODEL_RABBITMQ_MAP.get(sender, (None, None))
+        if basename and condition(instance):
+            action = ['update','insert'][int(created) or getattr(instance,'nuovo_cu',None)]
+            return u"%s.%s" % (basename, action)
+        else:
+            return None
 
-    data = serializers.serialize("json", [instance])
+    import pika
+    @receiver(post_save)
+    def my_log_queue(sender, instance, created, **kwargs):
 
-"""
-    # Publish changes to RabbitMQ server
-    routing_key = get_rabbitmq_routing_key(sender, instance, created)
+        data = serializers.serialize("json", [instance], indent=2)
 
-    if routing_key:
-        #RABBITMQ_SETTINGS
+        # Publish changes to RabbitMQ server
+        routing_key = get_rabbitmq_routing_key(sender, instance, created)
 
-        RABBITMQ_connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**settings.RABBITMQ)
-        )
-        RABBITMQ_channel = RABBITMQ_connection.channel()
+        if routing_key:
+            #RABBITMQ_SETTINGS
 
-        RABBITMQ_channel.basic_publish(
-            exchange='application', routing_key=routing_key, body=data
-        )
-        RABBITMQ_connection.close()
+            RABBITMQ_connection = pika.BlockingConnection(
+                pika.ConnectionParameters(**settings.RABBITMQ)
+            )
+            RABBITMQ_channel = RABBITMQ_connection.channel()
 
-    # print("[DB WRITE %s] %s" % (routing_key, data))
-"""
+            RABBITMQ_channel.basic_publish(
+                exchange='application', routing_key=routing_key, body=data
+            )
+            RABBITMQ_connection.close()
+
+            logger.debug("[DB WRITE %s] %s" % (routing_key, data))
+        else:
+            logger.debug("[NO RABBIT DB WRITE] %s" % data)
 
 
-# STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
-# RABBITMQ_connection = pika.BlockingConnection(
-#     pika.ConnectionParameters(**settings.RABBITMQ)
-# )
-# RABBITMQ_channel = RABBITMQ_connection.channel()
-# routing_key = 'humen.update'
-# data='ciao mondo'
-# RABBITMQ_channel.exchange_declare(
-#     exchange='application', type='direct'
-# )
-# RABBITMQ_channel.basic_publish(
-#     exchange='application', routing_key=routing_key, body=data
-# )
-# RABBITMQ_connection.close()
+    # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
+    # RABBITMQ_connection = pika.BlockingConnection(
+    #     pika.ConnectionParameters(**settings.RABBITMQ)
+    # )
+    # RABBITMQ_channel = RABBITMQ_connection.channel()
+    # routing_key = 'humen.update'
+    # data='ciao mondo'
+    # RABBITMQ_channel.exchange_declare(
+    #     exchange='application', type='direct'
+    # )
+    # RABBITMQ_channel.basic_publish(
+    #     exchange='application', routing_key=routing_key, body=data
+    # )
+    # RABBITMQ_connection.close()

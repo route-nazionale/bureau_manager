@@ -1,10 +1,12 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-from edda.models import Vclans, Humen
+from edda.models import Vclans, Humen, HumenSostituzioni
+from edda.views_support import HttpJSONResponse
 
 def can_update_stato_di_arrivo(user):
 
@@ -68,4 +70,38 @@ def humen_do_set_retired_quartiere(request, pk):
 
     return HttpResponse("OK")
 
-    
+@csrf_exempt
+#@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def humen_do_prepare_substitution(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+    x, created = HumenSostituzioni.objects.get_or_create(humen=hu)
+
+    return HttpJSONResponse(
+        { 'url' : reverse('admin:edda_humensostituzioni_change', args=(x.pk,))}
+    )
+
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def vclan_do_set_null_arrived_campo(request, pk):
+
+    vclan = get_object_or_404(Vclans, pk=pk)
+    vclan.update_arrivo_al_campo(None)
+    vclan.save()
+
+    return HttpResponse("OK")
+
+
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def humen_do_set_null_arrived_quartiere(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+    hu.update_arrivo_al_quartiere(None)
+    hu.save()
+
+    return HttpResponse("OK")
+

@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
-from edda.models import Humen, Periodipartecipaziones
+from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 
 from django.http import HttpResponseRedirect
@@ -138,6 +138,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
     list_filter = [
         'ruolo',
         'vclan',
+        'vclan__arrivato_al_campo',
+        'arrivato_al_quartiere',
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu', 'periodo_partecipazione']
@@ -381,6 +383,7 @@ class VclansAdmin(admin.ModelAdmin):
 
     list_filter = [
         'nome',
+        'arrivato_al_campo',
     ]
 
     actions = [
@@ -452,8 +455,45 @@ class VclansAdmin(admin.ModelAdmin):
         return not request.user.is_readonly()
     # End wrap readonly permissions
 
+class HumenSostituzioniAdmin(admin.ModelAdmin):
+
+    list_display = ('__unicode__', 'vclan', 'humen', 'humen_sostituito_da', 'updated_at')
+    list_filter = ('humen__vclan',)
+
+    fields = ('humen', 'humen_sostituito_da', 'updated_at')
+    readonly_fields = ('humen', 'updated_at')
+
+    actions_on_top = True
+
+    # Wrap readonly permissions
+    def get_actions(self, request):
+
+        if request.user.is_readonly():
+            actions = []
+        else:
+            actions = super(HumenSostituzioniAdmin, self).get_actions(request)
+        return actions
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser or bool(
+            request.user.groups.filter(name__in=['segreteria','tesorieri']).count()
+        )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "humen_sostituito_da":
+            kwargs["queryset"] = Humen.objects.filter(vclan=self._obj.humen.vclan).exclude(cu=self._obj.humen.cu)
+        return super(HumenSostituzioniAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_form(self, request, obj=None, **kwargs):
+        self._obj = obj
+        form_class = super(HumenSostituzioniAdmin, self).get_form(request, obj, **kwargs)
+        return form_class
 
 admin.site.register(Humen, BaseHumenAdmin)
+admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)
 #admin.site.register(RSHumen, RSAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)
