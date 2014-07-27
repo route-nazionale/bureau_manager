@@ -138,6 +138,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
     list_filter = [
         'ruolo',
         'vclan',
+        'vclan__arrivato_al_campo',
+        'arrivato_al_quartiere',
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu', 'periodo_partecipazione']
@@ -381,6 +383,7 @@ class VclansAdmin(admin.ModelAdmin):
 
     list_filter = [
         'nome',
+        'arrivato_al_campo',
     ]
 
     actions = [
