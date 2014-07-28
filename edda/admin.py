@@ -143,8 +143,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu', 
-        'periodo_partecipazione', 'arrivato_al_campo_display', 
-        'arrivato_al_quartiere_display', 'sostituito_da'
+        'periodo_partecipazione'
+    ]
+
+    hyperdynamic_fields = [
+        'arrivato_al_campo_display', 'arrivato_al_quartiere_display', 
+        'sostituito_da'
     ]
 
     #DEBUG list_per_page = 10
@@ -155,8 +159,6 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 ('vclan', 'codice_censimento'),
                 ('scout', 'agesci', 'classe_presenza'),
                 ('cu',),
-                'arrivato_al_campo_display', 'arrivato_al_quartiere_display',
-                'sostituito_da'
             ],
             'classes' : ('wide',)
         }),
@@ -214,21 +216,43 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return actions
 
     def has_add_permission(self, request):
-        return not request.user.is_readonly()
+        rv = super(BaseHumenAdmin, self).has_add_permission(request)
+        return not request.user.is_readonly() or rv
 
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def get_form(self, request, obj):
-        if obj.ruolo.pk == 8:
-            self.base_readonly_fields.append('vclan')
+    # End wrap readonly permissions
+
+    def get_form(self, request, obj=None):
+        """
+        Vedi issue https://github.com/route-nazionale/bureau_manager/issues/4
+
+        * Se sei superuser -> puoi cambiare tutti i vclan
+        * Altrimenti se ruolo == 8 puoi cambiare vclan tra quelli con lo stesso idgruppo
+
+        """
+        self._obj = obj #Hack to filter formfield_for_foreignkey
+        if obj:
+            if request.user.is_superuser or obj.ruolo.pk == 8:
+                # vclan can be modified
+                if 'vclan' in self.base_readonly_fields:
+                    self.base_readonly_fields.remove('vclan')
+            else:
+                self.base_readonly_fields.append('vclan')
             
         form = super(BaseHumenAdmin, self).get_form(request, obj)
-        form.base_fields['vclan'].widget.can_add_related = False
+        if form.base_fields.get('vclan'):
+            form.base_fields['vclan'].widget.can_add_related = False
         return form
             
-
-    # End wrap readonly permissions
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # if we are changing a person and we are not a superuser
+        if not request.user.is_superuser and self._obj and db_field.name == "vclan":
+            kwargs["queryset"] = Vclans.objects.filter(
+                idgruppo=self._obj.vclan.idgruppo
+            )
+        return super(BaseHumenAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     #def add_humen(self, request, queryset):
     #    return HttpResponseRedirect("/admin/edda/humen/add/")
@@ -236,6 +260,11 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     def change_view(self, request, *args, **kw):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+
+        for f in self.hyperdynamic_fields:
+            if f not in self.base_readonly_fields:
+                self.base_readonly_fields.append(f)
+                self.fieldsets[0][1]['fields'].append(f)
 
         if request.user.is_readonly():
             self.readonly_fields = self.base_readonly_fields + [
@@ -263,6 +292,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
     def add_view(self, request, *args, **kw):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+
+        # Clean an "add form"
+        for f in self.hyperdynamic_fields:
+            if f in self.base_readonly_fields:
+                self.base_readonly_fields.remove(f)
+                self.fieldsets[0][1]['fields'].remove(f)
 
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
