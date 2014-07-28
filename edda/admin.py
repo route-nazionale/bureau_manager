@@ -508,6 +508,10 @@ class VclansAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not request.user.is_readonly()
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     # End wrap readonly permissions
 
 class HumenSostituzioniAdmin(admin.ModelAdmin):
@@ -531,6 +535,9 @@ class HumenSostituzioniAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return not request.user.is_readonly()
 
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser or bool(
