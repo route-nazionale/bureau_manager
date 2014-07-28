@@ -210,10 +210,14 @@ class BaseHumenAdmin(admin.ModelAdmin):
             actions = []
         else:
             actions = super(BaseHumenAdmin, self).get_actions(request)
+            del actions['delete_selected']
         return actions
 
     def has_add_permission(self, request):
         return not request.user.is_readonly()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     #def get_form(self, request, obj):
     #    if obj.sostituito_da_set.count():
@@ -270,13 +274,13 @@ class BaseHumenAdmin(admin.ModelAdmin):
         for el in queryset:
             el.update_arrivo_al_quartiere(is_arrived=True)
             el.save()
-    arrivati_al_quartiere.short_description = "CONFERMA L'ARRIVO DI QUESTA PERSONA"
+    arrivati_al_quartiere.short_description = "CONFERMA L'ARRIVO DELLE PERSONE SELEZIONATE"
 
     def non_arrivati_al_quartiere(self, request, queryset):
         for el in queryset:
             el.update_arrivo_al_quartiere(is_arrived=False)
             el.save()
-    non_arrivati_al_quartiere.short_description = "REGISTRA CHE QUESTA PERSONA NON VIENE"
+    non_arrivati_al_quartiere.short_description = "REGISTRA CHE LE PERSONE SELEZIONATE NON VENGONO"
 
     #def imposta_ritirati(self, request, queryset):
     #    for el in queryset:
@@ -381,6 +385,9 @@ class HumenInline(admin.TabularInline):
         )
     nowrap__unicode__.short_description = u"Persona"
     nowrap__unicode__.allow_tags = True
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 class VclansAdmin(admin.ModelAdmin):
 
