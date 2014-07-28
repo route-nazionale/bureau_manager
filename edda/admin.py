@@ -220,10 +220,9 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return False
 
     def get_form(self, request, obj):
-    #    if obj.sostituito_da_set.count():
-    #        self.base_readonly_fields.append('sostituito_da')
-    #        self.fieldsets[0][1]['fields'].append('sostituito_da')
-    #        
+        if obj.ruolo.pk == 8:
+            self.base_readonly_fields.append('vclan')
+            
         form = super(BaseHumenAdmin, self).get_form(request, obj)
         form.base_fields['vclan'].widget.can_add_related = False
         return form

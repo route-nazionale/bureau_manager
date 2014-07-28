@@ -419,6 +419,13 @@ class Vclans(models.Model):
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
+    @property
+    def quartiere(self):
+        return self.contrada.quartiere
+
+    @property
+    def contrada(self):
+        return self.route.contrada
 
 class HumenSostituzioni(models.Model):
 
