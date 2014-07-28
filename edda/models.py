@@ -347,23 +347,23 @@ class Humen(models.Model):
 
     def arrivato_al_campo_display(self):
         if self.vclan.arrivato_al_campo == True:
-            css, button = 'success', 'S'
+            css, button, color = 'success', 'S', '#51a351'
         elif self.vclan.arrivato_al_campo == False:
-            css, button = 'danger', 'N'
+            css, button, color = 'danger', 'N', 'red'
         else:
-            css, button = 'warning', '?'
-        return format_html('<span class="label label-%s">%s</span>' % (css, button))
+            css, button, color = 'warning', '?', '#f89406'
+        return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
     def arrivato_al_quartiere_display(self):
         if self.arrivato_al_quartiere == True:
-            css, button = 'success', 'S'
+            css, button, color = 'success', 'S', '#51a351'
         elif self.arrivato_al_quartiere == False:
-            css, button = 'danger', 'N'
+            css, button, color = 'danger', 'N', 'red'
         else:
-            css, button = 'warning', '?'
-        return format_html('<span class="label label-%s">%s</span>' % (css, button))
+            css, button, color = 'warning', '?', '#f89406'
+        return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
     arrivato_al_quartiere_display.short_description = 'VARCO1'
     arrivato_al_quartiere_display.allow_tags = True
 
@@ -410,12 +410,12 @@ class Vclans(models.Model):
 
     def arrivato_al_campo_display(self):
         if self.arrivato_al_campo == True:
-            css, button = 'success', 'S'
+            css, button, color = 'success', 'S', '#51a351'
         elif self.arrivato_al_campo == False:
-            css, button = 'danger', 'N'
+            css, button, color = 'danger', 'N', 'red'
         else:
-            css, button = 'warning', '?'
-        return format_html('<span class="label label-%s">%s</span>' % (css, button))
+            css, button, color = 'warning', '?', '#f89406'
+        return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
 
