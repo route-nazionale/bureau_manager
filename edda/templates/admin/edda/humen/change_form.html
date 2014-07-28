@@ -12,7 +12,7 @@
             {% endif %}
             {% if original.arrivato_al_quartiere or original.arrivato_al_quartiere == None %}
                 <button name="_set_retired_quartiere" href="do-set-retired-quartiere/" class="btn btn-high btn-danger bureau-buttons" type="submit">REGISTRA CHE QUESTA PERSONA NON VIENE</button>
-                <button name="_set_substitution" href="do-prepare-substitution/" class="btn btn-high btn-danger" type="submit">SOSTITUISCI QUESTA PERSONA</button>
+                <button name="_set_substitution" href="do-prepare-substitution/" class="btn btn-high btn-danger" type="submit">SOSTITUISCI QUESTA PERSONA CON UN'ALTRA DEL SUO CLAN</button>
             {% else %}
                 <label name="_retired" class="btn" disabled="disabled" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</label>
             {% endif %}
