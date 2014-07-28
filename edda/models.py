@@ -338,6 +338,13 @@ class Humen(models.Model):
 
         return rv
 
+    @property
+    def sostituito_da(self):
+        if self.sostituito_da_set.count():
+            return self.sostituito_da_set.first().humen_sostituito_da
+        else:
+            return None
+
     def arrivato_al_campo_display(self):
         if self.vclan.arrivato_al_campo == True:
             css, button = 'success', 'S'
@@ -420,7 +427,7 @@ class HumenSostituzioni(models.Model):
         verbose_name="persona"
     )
     humen_sostituito_da = models.ForeignKey(Humen, to_field="cu", 
-        db_column="cu_sostituito_da", related_name="substituisce_da_set",
+        db_column="cu_sostituito_da", related_name="sostituisce_da_set",
         verbose_name="sostituito da",
         null=True
         

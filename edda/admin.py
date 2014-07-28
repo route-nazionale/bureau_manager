@@ -142,17 +142,22 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'arrivato_al_quartiere',
     ]
 
-    base_readonly_fields = ['codice_censimento', 'cu', 'periodo_partecipazione']
+    base_readonly_fields = ['codice_censimento', 'cu', 
+        'periodo_partecipazione', 'arrivato_al_campo_display', 
+        'arrivato_al_quartiere_display', 'sostituito_da'
+    ]
 
     #DEBUG list_per_page = 10
 
     fieldsets = (
         (None, {
-            'fields': (
+            'fields': [
                 ('vclan', 'codice_censimento'),
                 ('scout', 'agesci', 'classe_presenza'),
                 ('cu',),
-            ),
+                'arrivato_al_campo_display', 'arrivato_al_quartiere_display',
+                'sostituito_da'
+            ],
             'classes' : ('wide',)
         }),
         ('Anagrafica', {
@@ -211,9 +216,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return not request.user.is_readonly()
 
     #def get_form(self, request, obj):
-    #    if request.user.is_readonly():
-    #        disable_field(BaseHumenForm.classe_presenza)
-    #    form = super(BaseHumenAdmin, self).get_form(request, obj)
+    #    if obj.sostituito_da_set.count():
+    #        self.base_readonly_fields.append('sostituito_da')
+    #        self.fieldsets[0][1]['fields'].append('sostituito_da')
+    #        
+    #    return super(BaseHumenAdmin, self).get_form(request, obj)
+            
 
     # End wrap readonly permissions
 
@@ -252,6 +260,10 @@ class BaseHumenAdmin(admin.ModelAdmin):
         self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
 
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
+
+    def sostituito_da(self, obj):
+        humen = obj.sostituito_da
+        return humen or "Nessuno"
 
     def arrivati_al_quartiere(self, request, queryset):
         self.message_user(request, 'Benvenuti: %s' % " ".join(map(unicode, queryset)))
