@@ -132,7 +132,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'nome',
         'cognome',
         'vclan__nome',
-        'ruolo',
+        'ruolo__value',
     ]
 
     list_filter = [
