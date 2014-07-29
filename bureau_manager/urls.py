@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-check-in-quartiere/', "edda.views.vclans_do_check_in_quartiere"),
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-set-retired-campo/', "edda.views.vclans_do_set_retired_campo"),
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-set-null-arrived-campo/', "edda.views.vclan_do_set_null_arrived_campo"),
+    url(r'^admin/edda/vclans/(?P<pk>\d+)/do-set-null-arrived-quartiere/', "edda.views.vclan_do_set_null_arrived_quartiere"),
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-vclan-print-badge/', "edda.views.vclan_do_print_badge"),
     url(r'^admin/', include(admin.site.urls)),
 )

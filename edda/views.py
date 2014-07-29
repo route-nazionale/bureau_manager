@@ -95,6 +95,16 @@ def vclan_do_set_null_arrived_campo(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def vclan_do_set_null_arrived_quartiere(request, pk):
+
+    vclan = get_object_or_404(Vclans, pk=pk)
+    vclan.update_arrivo_al_quartiere(None)
+    vclan.save()
+
+    return HttpResponse("OK")
 
 @csrf_exempt
 @require_POST

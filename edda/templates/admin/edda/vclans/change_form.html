@@ -16,9 +16,13 @@
                 <button name="_set_arrived_campo" href="do-check-in-campo/" class="btn btn-high btn-info bureau-buttons" type="submit">SEGNA IL CLAN COME ARRIVATO AL CAMPO</button>
                 <button name="_set_retired_campo" href="do-set-retired-campo/" class="btn btn-high btn-danger bureau-buttons" type="submit">RITIRA IL CLAN DALLA ROUTE</button>
             {% endif %}
-
+            {% if original.arrivato_al_campo != None %}
+                <button name="_set_null_arrived_campo" href="do-set-null-arrived-campo/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO AL CAMPO SCONOSCIUTO</button>
+            {% endif %}
+            <button name="_set_null_arrived_campo" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">ANNULLA ARRIVO DI TUTTI AL QUARTIERE</button>
             <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
             <button name="_print_badge" href="do-vclan-print-badge/" class="btn btn-high btn-success" type="submit">STAMPA BADGE</button>
+
 
             
         <script type="text/javascript">
