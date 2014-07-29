@@ -377,11 +377,17 @@ class Humen(models.Model):
           badge_qs.update(is_valid=False)
           nums = []
           for badge in badge_qs:
-              nums.append(int(badge.code[15:]))
+              nums.append(badge.code[15])
           max_num = max(nums)
+          if max_num == '9':
+              new_num = 'A'
+          elif max_num == 'Z':
+              raise Exception('NumeroMassimoBadge', 'Questa persona ha stampato troppi badge, contatta lo staff IT')
+          else:
+              new_num = chr(ord(max_num) + 1)
       else:
-          max_num = -1
-      return HumenBadge.objects.create(humen=self, code=self.cu+'-'+str(max_num+1).zfill(2), is_valid=True)
+          new_num = '0'
+      return HumenBadge.objects.create(humen=self, code=self.cu+'-'+new_num, is_valid=True)
 
 class Vclans(models.Model):
 
