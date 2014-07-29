@@ -124,6 +124,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'cu',
         'nome',
         'cognome',
+        'quartiere',
+        'contrada',
         'my_class',
         'scout',
         'agesci',
@@ -206,6 +208,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
     change_list_template = "admin/change_list_pagination_on_top.html"
     actions_on_bottom = True
     actions_on_top = True
+
+    def quartiere(self, obj):
+        return obj.vclan.quartiere
+
+    def contrada(self, obj):
+        return obj.vclan.contrada
 
     # Wrap readonly permissions
     def get_actions(self, request):
