@@ -15,6 +15,7 @@
                 <button name="_set_substitution" href="do-prepare-substitution/" class="btn btn-high btn-danger" type="submit">SOSTITUISCI QUESTA PERSONA CON UN'ALTRA DEL SUO CLAN</button>
             {% else %}
                 <label name="_retired" class="btn" disabled="disabled" style="border-color:red; font-weight:bold">NON VIENE IN ROUTE</label>
+                <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO SCONOSCIUTO (ripristina valore iniziale)</button>
             {% endif %}
 
             {% if original.arrivato_al_quartiere != None and not original.sostituito_da_set.count %}
