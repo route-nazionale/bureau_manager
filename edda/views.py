@@ -1,12 +1,16 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 from edda.models import Vclans, Humen, HumenSostituzioni
 from edda.views_support import HttpJSONResponse, make_pdf_response
+
+import json
 
 def can_update_stato_di_arrivo(user):
     return user.is_superuser or user.groups.filter(name__in=["tesorieri","segreteria"]).count()
@@ -135,3 +139,63 @@ def vclan_do_print_badge(request, pk):
     badges = [member.get_new_badge() for member in vclan.humen_set.all() ]
 
     return make_pdf_response({ 'qs' :badges }, 'badge_qs.html')
+
+
+# --------------------------------------------------------------
+
+@staff_member_required
+def check_in(request):
+    return render_to_response('check-in.html')
+
+@staff_member_required
+def api_vclans_list(request):
+    
+    vclans = [clan.nome for clan in Vclans.objects.all()]
+    
+    return HttpResponse(json.dumps(vclans), content_type="application/json")
+
+@staff_member_required
+@csrf_exempt
+def api_set_vclan_arrived(request):
+
+    if not 'vclanid' in request.POST:
+        return HttpResponse(
+            json.dumps({'status': 'error', 'message': 'Devi inserire il clan arrivato'}),
+            content_type="application/json"
+        )
+
+    clan = Vclans.objects.get(idvclan=request.POST['vclanid'])
+    clan.update_arrivo_al_campo(True)
+    clan.save()
+
+    return HttpResponse(json.dumps({'status': 'OK'}), content_type="application/json")
+
+@staff_member_required
+@csrf_exempt
+def api_search_vclan(request):
+
+    if not 'vclan' in request.POST:
+        return HttpResponse(
+            json.dumps({'status': 'error', 'message': 'Devi inserire il clan da cercare'}),
+            content_type="application/json"
+        )
+
+    response = []
+
+    for clan in Vclans.objects.filter(nome=request.POST['vclan']):
+        route = []
+        for friend in  Vclans.objects.filter(route_num=clan.route_num):
+            el = {
+                'nome': friend.nome,
+                'route': friend.route_num,
+                'idvclan': friend.idvclan,
+                'npersone': friend.humen_set.count(),
+                'quartiere': friend.quartiere,
+                'contrada': friend.contrada,
+                'arrivato': friend.arrivato_al_campo,
+            }
+            route.append(el)
+        response.append({'route': clan.route_num, 'clans': route})
+
+    return HttpResponse(json.dumps(response), content_type="application/json")
+

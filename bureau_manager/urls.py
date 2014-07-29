@@ -22,4 +22,9 @@ urlpatterns = patterns('',
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-set-null-arrived-quartiere/', "edda.views.vclan_do_set_null_arrived_quartiere"),
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-vclan-print-badge/', "edda.views.vclan_do_print_badge"),
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'api/vclans-list/', 'edda.views.api_vclans_list'),
+    url(r'api/search-vclan/', 'edda.views.api_search_vclan'),
+    url(r'api/set-vclan-arrived/', 'edda.views.api_set_vclan_arrived'),
+    url(r'check-in/', 'edda.views.check_in'),
 )

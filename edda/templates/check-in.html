@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>Check In a San Rossore</title>
+
+        <!-- Bootstrap css-->
+        <link rel="stylesheet" href="/static/edda/bootstrap.min.css">
+
+        <style>
+
+            /* Typeahead style */
+            .typeahead,
+            .tt-query,
+            .tt-hint {
+                width:370px;
+            }
+
+            .typeahead {
+                background-color: #fff;
+            }
+
+/*
+            .typeahead:focus {
+                border: 2px solid #0097cf;
+            }
+*/
+            .tt-query {
+                -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+                -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            }
+
+            .tt-hint {
+                color: #999
+            }
+
+            .tt-dropdown-menu {
+                width: 370px;
+                margin-top: 12px;
+                padding: 8px 0;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                -webkit-border-radius: 8px;
+                -moz-border-radius: 8px;
+                border-radius: 8px;
+                -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+                -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+                box-shadow: 0 5px 10px rgba(0,0,0,.2);
+            }
+
+            .tt-suggestion {
+                padding: 3px 20px;
+                font-size: 15px;
+                line-height: 24px;
+            }
+            .tt-suggestion.tt-cursor {
+                color: #fff;
+                background-color: #0097cf;
+
+            }
+            .tt-suggestion p {
+                margin: 0;
+            }
+
+            .gist {
+                font-size: 14px;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="clan" style="margin: 5px;" class="form-inline">
+          <div class="form-group">
+            <input class="typeahead form-control" id="gruppo" name="scout-unit" type="text" placeholder="Gruppo scout" value="" required>
+            <button style="position: relative; top: 6px;"id="cerca" class="btn btn-default form-control" type="button">Cerca</button>
+          </div>
+        </div>
+        <div id="alerts"></div>
+
+        <div id="modello" class="panel panel-primary" style="display: none; margin: 5px;">
+          <div class="panel-heading"></div>
+          <div class="panel-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Nome Clan</th>
+                  <th>ID Clan</th>
+                  <th>N.Persone</th>
+                  <th>Quartiere</th>
+                  <th>Contrada</th>
+                  <th>Arrivato</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+              
+
+        <!-- jquery js -->
+        <script src="/static/edda/jquery-1.11.0.min.js"></script>
+        <!-- Bootstrap js -->
+        <script src="/static/edda/bootstrap.min.js"></script>
+        <!-- typeahead -->
+        <script src="/static/edda/typeahead.bundle.min.js"></script>
+
+        <script>
+
+function checkin(e) {
+  if(confirm('Sei sicuro di voler fare il check-in del clan '+e+'?')) {
+    $.post(
+      'api/set-vclan-arrived/',
+      {'vclanid': e},
+      function(data, textStatus, jqXHR) {
+        $('.model').remove();
+        $('#gruppo').val('');
+        $('#alerts').append('<div class="alert alert-success" role="alert">Il clan '+e+' è arrivato!</div>').fadeIn();
+        setTimeout(function(){
+          $('.alert').fadeOut();
+        }, 3000);
+        window.requested_clan = null;
+    }).fail(function(){
+      alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
+    });
+  }
+}
+
+$(document).ready(function() {
+
+    $('#cerca').click(function(){
+        $('.model').remove();
+        window.requested_clan = $('#gruppo').val();
+        $.post(
+          'api/search-vclan/', 
+          {'vclan': window.requested_clan},
+          function(data, textStatus, jqXHR) {
+            console.log(window.requested_clan);
+            $.each(data, function(i, route) {
+              table = $('#modello').clone();
+              table.attr('id', route['route']);
+              table.css('display', 'block');
+              table.addClass('model');
+              $('body').append(table);
+              $('#'+route['route']+' .panel-heading').html('Route n: <strong>'+route['route']+'</strong>');
+              $.each(route.clans, function(j, clan) {
+
+
+                if(clan['nome'] == window.requested_clan && clan['arrivato'] != true) {
+                  button = '<button class="btn btn-success checkin" onclick="checkin(\''+clan['idvclan']+'\');">CHECK IN</button>';
+                } else {
+                  button = '';
+                }
+
+                if(clan['arrivato'] == true) {
+                  arrivato = '<span class="label label-success" style="font-size: 18px; padding: 3px;">S</span>';
+                }
+                if(clan['arrivato'] == false) {
+                  arrivato = '<span class="label label-danger" style="font-size: 18px; padding: 3px;">N</span>';
+                }
+                if(clan['arrivato'] == null) {
+                  arrivato = '<span class="label label-warning" style="font-size: 18px; padding: 3px;">?</span>';
+                }
+
+                row = "<tr>"+ 
+                "<td>"+button+"</td>"+
+                "<td>"+clan['nome']+"</td>"+
+                "<td class='idvclan'>"+clan['idvclan']+"</td>"+
+                "<td>"+clan['npersone']+"</td>"+
+                "<td>"+clan['quartiere']+"</td>"+
+                "<td>"+clan['contrada']+"</td>"+
+                "<td>"+arrivato+"</td>"+
+                "</tr>";
+
+                $('#'+route['route']+' tbody').append(row);
+              });
+            });
+          }
+        ).fail(function(){
+          alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
+        });
+    });
+
+    // typeahead initialitation
+    $.get('/api/vclans-list/', function(data) {
+        // constructs the suggestion engine
+        var units = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: $.map(data, function(state) {
+                return {value: state};
+            })
+        });
+
+        // kicks off the loading/processing of `local` and `prefetch`
+        units.initialize();
+
+        $('input[name="scout-unit"]').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'units',
+            displayKey: 'value',
+            source: units.ttAdapter()
+        });
+    },
+            'json');
+
+});
+        </script>
+    </body>
+</html>
