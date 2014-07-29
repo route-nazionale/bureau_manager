@@ -20,6 +20,7 @@
             {% if original.arrivato_al_quartiere != None and not original.sostituito_da_set.count %}
                 <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO SCONOSCIUTO (ripristina valore iniziale)</button>
             {% endif %}
+            <button name="_print_badge" href="do-humen-print-badge/" class="btn btn-high btn-success" type="submit">STAMPA BADGE</button>
 
         <script type="text/javascript">
             $('button[name=_set_substitution]').click(function (e) {
@@ -32,6 +33,17 @@
                         else
                             alert("Ritorno inaspettato: " + data)
                     });
+                e.stopPropagation();
+                return false;
+            });
+            
+            $('button[name=_print_badge]').click(function (e) {
+                if(!confirm('Se stampi un nuovo badge, quello vecchio non sarà più valido. Sei sicuro?')) {
+                  e.stopPropagation();
+                  return false;
+                }
+                //window.location.href = 'do-print-badge/';
+                window.open('do-humen-print-badge/', '_blank');
                 e.stopPropagation();
                 return false;
             });

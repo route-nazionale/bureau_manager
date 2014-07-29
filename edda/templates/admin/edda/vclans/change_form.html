@@ -18,11 +18,24 @@
             {% endif %}
 
             <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
+            <button name="_print_badge" href="do-vclan-print-badge/" class="btn btn-high btn-success" type="submit">STAMPA BADGE</button>
+
             
         <script type="text/javascript">
 
             $('button[name=_add_rover_o_scolta]').click(function (e) {
                 window.open('{% url "admin:edda_humen_add" %}?vclan_id={{ original.pk }}');
+                e.stopPropagation();
+                return false;
+            });
+
+            $('button[name=_print_badge]').click(function (e) {
+                if(!confirm('Se stampi un nuovo badge, quello vecchio non sarà più valido. Sei sicuro?')) {
+                  e.stopPropagation();
+                  return false;
+                }
+                //window.location.href = 'do-print-badge/';
+                window.open('do-vclan-print-badge/', '_blank');
                 e.stopPropagation();
                 return false;
             });

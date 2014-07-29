@@ -1,0 +1,12 @@
+<style>
+  p {
+    font-size: 22px;
+  }
+</style>
+{% for badge in qs %}
+  <p class="nome">{{badge.humen_nome}}</p>
+  <p class="cognome">{{badge.humen_cognome}}</p>
+  <p class="clan">{{badge.humen_vclan}}</p>
+  <p class="code">{{badge.code}}</p>
+  <img class="qrcode" src="{{ badge.qrcode }}">
+{% endfor %}

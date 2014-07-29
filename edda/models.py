@@ -24,6 +24,10 @@ from django.utils.html import format_html
 
 import logging, datetime
 
+import qrcode
+import base64
+import StringIO
+
 logger = logging.getLogger(__name__)
 
 class Ruolipartecipante(models.Model):
@@ -367,6 +371,18 @@ class Humen(models.Model):
     arrivato_al_quartiere_display.short_description = 'VARCO1'
     arrivato_al_quartiere_display.allow_tags = True
 
+    def get_new_badge(self):
+      badge_qs = self.badge_set.all()
+      if badge_qs.count():
+          badge_qs.update(is_valid=False)
+          nums = []
+          for badge in badge_qs:
+              nums.append(int(badge.code[15:]))
+          max_num = max(nums)
+      else:
+          max_num = -1
+      return HumenBadge.objects.create(humen=self, code=self.cu+'-'+str(max_num+1).zfill(2), is_valid=True)
+
 class Vclans(models.Model):
 
     idvclan = models.CharField(max_length=255, blank=True)
@@ -463,8 +479,53 @@ class HumenSostituzioni(models.Model):
             self.humen.arrivato_al_quartiere = False
             self.humen.save()
 
-#--------------------------------------------------------------------------------
+class HumenBadge(models.Model):
 
+    humen = models.ForeignKey(Humen, to_field="cu", 
+        db_column="cu", related_name="badge_set",
+        verbose_name="persona"
+    )
+
+    code = models.CharField(max_length=16, unique=True) 
+
+    is_valid = models.BooleanField(default=True, verbose_name='valido')
+
+    updated_at = models.DateTimeField(
+        verbose_name='ultimo aggiornamento', help_text='', auto_now=True
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'humen_badge'
+        verbose_name = 'badge'
+        verbose_name_plural = 'badge'
+
+    def __unicode__(self):
+        return u"%s - %s" % (self.humen, self.code[15:])
+
+    @property
+    def qrcode(self):
+        qr_code = qrcode.make(self.code)
+        qr_code_output = StringIO.StringIO()
+        qr_code.save(qr_code_output)
+        image = qr_code_output.getvalue()
+        data = base64.b64encode(image)
+        data = "data:image/png;base64," + data
+        return data
+
+    @property
+    def humen_nome(self):
+        return self.humen.nome
+
+    @property
+    def humen_cognome(self):
+        return self.humen.cognome
+
+    @property
+    def humen_vclan(self):
+        return self.humen.vclan.nome
+
+#--------------------------------------------------------------------------------
 
 class Contradas(models.Model):
     numero = models.IntegerField(blank=True, null=True)

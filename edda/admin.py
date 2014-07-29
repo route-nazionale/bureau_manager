@@ -3,7 +3,9 @@
 from django.contrib import admin
 from django.contrib import messages
 from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
+from edda.models import HumenBadge
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
+from edda.views_support import make_pdf_response
 
 from django.http import HttpResponseRedirect
 from django import forms
@@ -198,7 +200,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
     actions = [
         'arrivati_al_quartiere',
         'non_arrivati_al_quartiere',
-        #'imposta_ritirati',
+        'stampa_badge',
     ]
 
     change_list_template = "admin/change_list_pagination_on_top.html"
@@ -318,12 +320,13 @@ class BaseHumenAdmin(admin.ModelAdmin):
             el.save()
     non_arrivati_al_quartiere.short_description = "REGISTRA CHE LE PERSONE SELEZIONATE NON VENGONO"
 
-    #def imposta_ritirati(self, request, queryset):
-    #    for el in queryset:
-    #        el.ritirato = True
-    #        el.update_arrivo_al_quartiere(is_arrived=False)
-    #        el.save()
-    #imposta_ritirati.short_description = 'Imposta RITIRO'
+    def stampa_badge(self, request, queryset):
+        
+        badge_qs = []
+        for hu in queryset:
+            badge_qs.append(hu.get_new_badge())
+        return make_pdf_response({ 'qs' : badge_qs }, 'badge_qs.html')
+    stampa_badge.short_description = 'STAMPA BADGE DELLE PERSONE SELEZIONATE'
 
     def my_class(self, obj):
 
@@ -554,8 +557,13 @@ class HumenSostituzioniAdmin(admin.ModelAdmin):
         form_class = super(HumenSostituzioniAdmin, self).get_form(request, obj, **kwargs)
         return form_class
 
+class HumenBadgeAdmin(admin.ModelAdmin):
+
+    list_display = ('__unicode__', 'humen', 'code', 'is_valid', 'updated_at')
+
 admin.site.register(Humen, BaseHumenAdmin)
 admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)
+admin.site.register(HumenBadge, HumenBadgeAdmin)
 #admin.site.register(RSHumen, RSAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)

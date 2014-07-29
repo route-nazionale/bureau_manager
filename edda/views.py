@@ -6,10 +6,12 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test, login_required
 
 from edda.models import Vclans, Humen, HumenSostituzioni
-from edda.views_support import HttpJSONResponse
+from edda.views_support import HttpJSONResponse, make_pdf_response
 
 def can_update_stato_di_arrivo(user):
+    return user.is_superuser or user.groups.filter(name__in=["tesorieri","segreteria"]).count()
 
+def can_print_badge(user):
     return user.is_superuser or user.groups.filter(name__in=["tesorieri","segreteria"]).count()
 
 @csrf_exempt
@@ -105,3 +107,21 @@ def humen_do_set_null_arrived_quartiere(request, pk):
 
     return HttpResponse("OK")
 
+@csrf_exempt
+@user_passes_test(can_print_badge)
+def humen_do_print_badge(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+
+    return make_pdf_response({ 'qs' :[hu.get_new_badge()] }, 'badge_qs.html')
+
+
+@csrf_exempt
+@user_passes_test(can_print_badge)
+def vclan_do_print_badge(request, pk):
+
+    vclan = get_object_or_404(Vclans, pk=pk)
+
+    badges = [member.get_new_badge() for member in vclan.humen_set.all() ]
+
+    return make_pdf_response({ 'qs' :badges }, 'badge_qs.html')
