@@ -403,8 +403,11 @@ class Vclans(models.Model):
     arrivato_al_campo = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
-    #route = models.ForeignKey('Routes', db_column='route_id', null=True)
+    route_num = models.IntegerField(db_column='route', null=True)
     #is_ospitante = models.NullBooleanField(default=None)
+
+    quartiere = models.IntegerField(blank=True, null=True)
+    contrada = models.IntegerField(blank=True, null=True)
 
     class Meta:
         #managed = False
@@ -440,14 +443,6 @@ class Vclans(models.Model):
         return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
-
-    @property
-    def quartiere(self):
-        return self.contrada.quartiere
-
-    @property
-    def contrada(self):
-        return self.route.contrada
 
 class HumenSostituzioni(models.Model):
 
@@ -594,11 +589,11 @@ class Routes(models.Model):
     name = models.CharField(max_length=255, blank=True)
     numero = models.IntegerField(blank=True, null=True)
     area = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
+    #created_at = models.DateTimeField(blank=True, null=True)
+    #updated_at = models.DateTimeField(blank=True, null=True)
     quartiere = models.IntegerField(blank=True, null=True)
     quartiere_lock = models.IntegerField(blank=True, null=True)
-    contrada_id = models.IntegerField(blank=True, null=True)
+    contrada = models.IntegerField(blank=True, null=True)
 
     class Meta:
         #managed = False

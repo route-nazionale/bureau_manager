@@ -442,6 +442,8 @@ class VclansAdmin(admin.ModelAdmin):
     list_filter = [
         'nome',
         'arrivato_al_campo',
+        'quartiere',
+        'contrada',
     ]
 
     actions = [
@@ -457,13 +459,13 @@ class VclansAdmin(admin.ModelAdmin):
     save_on_top = True
 
     list_display = (
-        '__unicode__', 'arrivato_al_campo_display', 'nome', 'idgruppo', 'idunitagruppo'
+        '__unicode__', 'arrivato_al_campo_display', 'quartiere', 'contrada', 'idgruppo', 'idunitagruppo'
     )
 
     fieldsets = (
         (None, {
             'fields': (
-                ('nome', 'idgruppo', 'idunitagruppo',
+                ('nome', 'quartiere', 'contrada', 'route_num', 'idgruppo', 'idunitagruppo',
                 'regione', 'arrivato_al_campo_display',)
             )
         }),
