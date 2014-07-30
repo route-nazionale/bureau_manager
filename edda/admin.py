@@ -163,7 +163,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         (None, {
             'fields': [
                 ('vclan', 'codice_censimento'),
-                ('scout', 'agesci', 'classe_presenza'),
+                ('scout'),
+                ('agesci', 'classe_presenza'),
                 ('cu',), 'quartiere', 'contrada',
             ],
             'classes' : ('wide',)
@@ -182,7 +183,11 @@ class BaseHumenAdmin(admin.ModelAdmin):
         }),
         ('Strade di coraggio', {
             'fields': (
-                ('stradadicoraggio1', 'stradadicoraggio2', 'stradadicoraggio3', 'stradadicoraggio4', 'stradadicoraggio5'),
+                ('stradadicoraggio1'),
+                ('stradadicoraggio2'),
+                ('stradadicoraggio3'),
+                ('stradadicoraggio4'),
+                ('stradadicoraggio5'),
             )
         }),
         ('Alimentazione', {
