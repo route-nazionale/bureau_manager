@@ -144,10 +144,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'vclan',
         'vclan__arrivato_al_campo',
         'arrivato_al_quartiere',
+        'vclan__quartiere',
+        'vclan__contrada',
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu', 
-        'periodo_partecipazione'
+        'periodo_partecipazione', 'quartiere', 'contrada'
     ]
 
     hyperdynamic_fields = [
@@ -162,7 +164,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             'fields': [
                 ('vclan', 'codice_censimento'),
                 ('scout', 'agesci', 'classe_presenza'),
-                ('cu',),
+                ('cu',), 'quartiere', 'contrada',
             ],
             'classes' : ('wide',)
         }),
