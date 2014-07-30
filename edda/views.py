@@ -38,7 +38,7 @@ def vclans_do_check_in_quartiere(request, pk):
     if not vc.arrivato_al_campo:
         vc.update_arrivo_al_campo(True)
     vc.update_arrivo_al_quartiere(True)
-    vc.arrivato_al_quartiere(True)
+    vc.arrivato_al_quartiere = True
     vc.save()
 
     return HttpResponse("OK")
