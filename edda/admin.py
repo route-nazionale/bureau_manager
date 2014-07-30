@@ -164,7 +164,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
             'fields': [
                 ('vclan', 'codice_censimento'),
                 ('scout'),
-                ('agesci', 'classe_presenza'),
+                ('agesci'),
+                ('classe_presenza'),
                 ('cu',), 'quartiere', 'contrada',
             ],
             'classes' : ('wide',)
