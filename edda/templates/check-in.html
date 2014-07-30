@@ -16,18 +16,18 @@
             .typeahead,
             .tt-query,
             .tt-hint {
-                width:370px;
+                width:100%;
             }
 
             .typeahead {
                 background-color: #fff;
             }
 
-/*
-            .typeahead:focus {
-                border: 2px solid #0097cf;
-            }
-*/
+            /*
+                        .typeahead:focus {
+                            border: 2px solid #0097cf;
+                        }
+            */
             .tt-query {
                 -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
                 -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -70,39 +70,88 @@
             .gist {
                 font-size: 14px;
             }
-        </style>
 
+            #gruppo {
+                border: none;
+                right: 0px;
+                width: 100%!important;
+            }
+            .twitter-typeahead {
+                height: 100%;
+                width: 100%;
+                margin: -6px -12px;
+                border-radius: 2px;
+                padding: 2px;
+            }
+            .header {
+                border-bottom: solid thin #cccccc;
+                margin-bottom: 20px;
+            }
+            .jumbotron {
+                padding: 24px;
+            }
+            #clan .form-control,
+            #clan .input-group-btn .btn {
+                height: 42px;
+            }
+            #clan .input-group-btn .btn { 
+                font-size: 16px;
+            }
+            #clan .typeahead {
+                height: 30px;
+                padding-left: 10px;
+                font-size: 1.5em;
+                line-height: 1.4em;
+            }
+            #gruppo {
+                margin-top: -2px;
+            }
+        </style>
     </head>
     <body>
-        <div id="clan" style="margin: 5px;" class="form-inline">
-          <div class="form-group">
-            <input class="typeahead form-control" id="gruppo" name="scout-unit" type="text" placeholder="Gruppo scout" value="" required>
-            <button style="position: relative; top: 6px;"id="cerca" class="btn btn-default form-control" type="button">Cerca</button>
-          </div>
+        <div class="container">
+            <div class="header">
+                <h2 class="text-muted">Check-in a San Rossore</h2>
+            </div>
+            <div class="jumbotron">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
+                        <div id="clan" style="margin: 5px;" class="form-inline">
+                            <div class="input-group">
+                                <div class="form-control">
+                                    <input class="typeahead" id="gruppo" name="scout-unit" type="text" placeholder="Gruppo scout" value="">
+                                </div>
+                                <div class="input-group-btn">
+                                    <button id="cerca" class="btn btn-default" type="button">Cerca</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="alerts"></div>
+            <div id="modello" class="panel panel-primary" style="display: none; margin: 5px;">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Nome Clan</th>
+                                <th>ID Clan</th>
+                                <th>N.Persone</th>
+                                <th>Quartiere</th>
+                                <th>Contrada</th>
+                                <th>Arrivato</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div id="alerts"></div>
 
-        <div id="modello" class="panel panel-primary" style="display: none; margin: 5px;">
-          <div class="panel-heading"></div>
-          <div class="panel-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Nome Clan</th>
-                  <th>ID Clan</th>
-                  <th>N.Persone</th>
-                  <th>Quartiere</th>
-                  <th>Contrada</th>
-                  <th>Arrivato</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-        </div>
-              
 
         <!-- jquery js -->
         <script src="/static/edda/jquery-1.11.0.min.js"></script>
@@ -113,108 +162,112 @@
 
         <script>
 
-function checkin(e) {
-  if(confirm('Sei sicuro di voler fare il check-in del clan '+e+'?')) {
-    $.post(
-      'api/set-vclan-arrived/',
-      {'vclanid': e},
-      function(data, textStatus, jqXHR) {
-        $('.model').remove();
-        $('#gruppo').val('');
-        $('#alerts').append('<div class="alert alert-success" role="alert">Il clan '+e+' è arrivato!</div>').fadeIn();
-        setTimeout(function(){
-          $('.alert').fadeOut();
-        }, 3000);
-        window.requested_clan = null;
-    }).fail(function(){
-      alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
-    });
-  }
-}
-
-$(document).ready(function() {
-
-    $('#cerca').click(function(){
-        $('.model').remove();
-        window.requested_clan = $('#gruppo').val();
-        $.post(
-          'api/search-vclan/', 
-          {'vclan': window.requested_clan},
-          function(data, textStatus, jqXHR) {
-            console.log(window.requested_clan);
-            $.each(data, function(i, route) {
-              table = $('#modello').clone();
-              table.attr('id', route['route']);
-              table.css('display', 'block');
-              table.addClass('model');
-              $('body').append(table);
-              $('#'+route['route']+' .panel-heading').html('Route n: <strong>'+route['route']+'</strong>');
-              $.each(route.clans, function(j, clan) {
-
-
-                if(clan['nome'] == window.requested_clan && clan['arrivato'] != true) {
-                  button = '<button class="btn btn-success checkin" onclick="checkin(\''+clan['idvclan']+'\');">CHECK IN</button>';
-                } else {
-                  button = '';
+            function checkin(e) {
+                if (confirm('Sei sicuro di voler fare il check-in del clan ' + e + '?')) {
+                    $.post(
+                            'api/set-vclan-arrived/',
+                            {'vclanid': e},
+                    function(data, textStatus, jqXHR) {
+                        $('.model').remove();
+                        $('#gruppo').val('');
+                        $('#alerts').append('<div class="alert alert-success" role="alert">Il clan ' + e + ' è arrivato!</div>').fadeIn();
+                        setTimeout(function() {
+                            $('.alert').fadeOut();
+                        }, 3000);
+                        window.requested_clan = null;
+                    }).fail(function() {
+                        alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
+                    });
                 }
+            }
 
-                if(clan['arrivato'] == true) {
-                  arrivato = '<span class="label label-success" style="font-size: 18px; padding: 3px;">S</span>';
-                }
-                if(clan['arrivato'] == false) {
-                  arrivato = '<span class="label label-danger" style="font-size: 18px; padding: 3px;">N</span>';
-                }
-                if(clan['arrivato'] == null) {
-                  arrivato = '<span class="label label-warning" style="font-size: 18px; padding: 3px;">?</span>';
-                }
+            $(document).ready(function() {
 
-                row = "<tr>"+ 
-                "<td>"+button+"</td>"+
-                "<td>"+clan['nome']+"</td>"+
-                "<td class='idvclan'>"+clan['idvclan']+"</td>"+
-                "<td>"+clan['npersone']+"</td>"+
-                "<td>"+clan['quartiere']+"</td>"+
-                "<td>"+clan['contrada']+"</td>"+
-                "<td>"+arrivato+"</td>"+
-                "</tr>";
+                $('#cerca').click(function() {
+                    $('.model').remove();
+                    window.requested_clan = $('#gruppo').val();
+                    $.post(
+                            'api/search-vclan/',
+                            {'vclan': window.requested_clan},
+                    function(data, textStatus, jqXHR) {
+                        console.log(window.requested_clan);
+                        $.each(data, function(i, route) {
+                            table = $('#modello').clone();
+                            table.attr('id', route['route']);
+                            table.css('display', 'block');
+                            table.addClass('model');
+                            $('body').append(table);
+                            $('#' + route['route'] + ' .panel-heading').html('Route n: <strong>' + route['route'] + '</strong>');
+                            $.each(route.clans, function(j, clan) {
 
-                $('#'+route['route']+' tbody').append(row);
-              });
+
+                                if (clan['nome'] == window.requested_clan && clan['arrivato'] != true) {
+                                    button = '<button class="btn btn-success checkin" onclick="checkin(\'' + clan['idvclan'] + '\');">CHECK IN</button>';
+                                } else {
+                                    button = '';
+                                }
+
+                                if (clan['arrivato'] == true) {
+                                    arrivato = '<span class="label label-success" style="font-size: 18px; padding: 3px;">S</span>';
+                                }
+                                if (clan['arrivato'] == false) {
+                                    arrivato = '<span class="label label-danger" style="font-size: 18px; padding: 3px;">N</span>';
+                                }
+                                if (clan['arrivato'] == null) {
+                                    arrivato = '<span class="label label-warning" style="font-size: 18px; padding: 3px;">?</span>';
+                                }
+
+                                row = "<tr>" +
+                                        "<td>" + button + "</td>" +
+                                        "<td>" + clan['nome'] + "</td>" +
+                                        "<td class='idvclan'>" + clan['idvclan'] + "</td>" +
+                                        "<td>" + clan['npersone'] + "</td>" +
+                                        "<td>" + clan['quartiere'] + "</td>" +
+                                        "<td>" + clan['contrada'] + "</td>" +
+                                        "<td>" + arrivato + "</td>" +
+                                        "</tr>";
+
+                                $('#' + route['route'] + ' tbody').append(row);
+                            });
+                        });
+                    }
+                    ).fail(function() {
+                        alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
+                    });
+                });
+
+                // typeahead initialitation
+                $.get('/api/vclans-list/', function(data) {
+                    data.push('Pippo 1');
+                    data.push('Pippo 2');
+                    data.push('Pippo 3');
+                    data.push('Pippo 4');
+                    // constructs the suggestion engine
+                    var units = new Bloodhound({
+                        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                        queryTokenizer: Bloodhound.tokenizers.whitespace,
+                        local: $.map(data, function(state) {
+                            return {value: state};
+                        })
+                    });
+
+                    // kicks off the loading/processing of `local` and `prefetch`
+                    units.initialize();
+
+                    $('input[name="scout-unit"]').typeahead({
+                        hint: true,
+                        highlight: true,
+                        minLength: 1
+                    },
+                    {
+                        name: 'units',
+                        displayKey: 'value',
+                        source: units.ttAdapter()
+                    });
+                },
+                        'json');
+
             });
-          }
-        ).fail(function(){
-          alert('Si è verificato un errore. Riprova e, se continua a non funzionare, contatta lo staff IT.');
-        });
-    });
-
-    // typeahead initialitation
-    $.get('/api/vclans-list/', function(data) {
-        // constructs the suggestion engine
-        var units = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            local: $.map(data, function(state) {
-                return {value: state};
-            })
-        });
-
-        // kicks off the loading/processing of `local` and `prefetch`
-        units.initialize();
-
-        $('input[name="scout-unit"]').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },
-        {
-            name: 'units',
-            displayKey: 'value',
-            source: units.ttAdapter()
-        });
-    },
-            'json');
-
-});
         </script>
     </body>
 </html>
