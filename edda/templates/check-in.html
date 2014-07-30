@@ -133,8 +133,8 @@
                 </div>
             </div>
             <div id="alerts"></div>
-            <div id="modello" class="panel panel-primary" style="display: none; margin: 5px;">
-                <div class="panel-heading"></div>
+            <div id="modello" class="panel panel-primary" style="display: none;">
+                <div class="panel-heading">Route n:</div>
                 <div class="panel-body">
                     <table class="table">
                         <thead>
@@ -241,10 +241,6 @@
 
                 // typeahead initialitation
                 $.get('/api/vclans-list/', function(data) {
-                    data.push('Pippo 1');
-                    data.push('Pippo 2');
-                    data.push('Pippo 3');
-                    data.push('Pippo 4');
                     // constructs the suggestion engine
                     var units = new Bloodhound({
                         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
