@@ -452,6 +452,7 @@ class VclansAdmin(admin.ModelAdmin):
     list_filter = [
         'nome',
         'arrivato_al_campo',
+        'arrivato_al_quartiere',
         'quartiere',
         'contrada',
     ]
