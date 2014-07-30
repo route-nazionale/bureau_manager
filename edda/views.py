@@ -45,11 +45,23 @@ def vclans_do_check_in_quartiere(request, pk):
 @csrf_exempt
 @require_POST
 @user_passes_test(can_update_stato_di_arrivo)
+def vclans_do_check_in_quartiere_vclan(request, pk):
+
+    vc = get_object_or_404(Vclans, pk=pk)
+    vc.arrivato_al_quartiere = True
+    vc.save()
+
+    return HttpResponse("OK")
+
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
 def vclans_do_set_retired_campo(request, pk):
 
     vc = get_object_or_404(Vclans, pk=pk)
     vc.update_arrivo_al_campo(False)
     vc.update_arrivo_al_quartiere(False)
+    vc.arrivato_al_quartiere(False)
     vc.save()
 
     return HttpResponse("OK")
@@ -106,6 +118,18 @@ def vclan_do_set_null_arrived_quartiere(request, pk):
 
     vclan = get_object_or_404(Vclans, pk=pk)
     vclan.update_arrivo_al_quartiere(None)
+    vclan.arrivato_al_quartiere = None
+    vclan.save()
+
+    return HttpResponse("OK")
+
+@csrf_exempt
+@require_POST
+@user_passes_test(can_update_stato_di_arrivo)
+def vclan_do_set_null_arrived_quartiere_vclan(request, pk):
+
+    vclan = get_object_or_404(Vclans, pk=pk)
+    vclan.arrivato_al_quartiere = None
     vclan.save()
 
     return HttpResponse("OK")

@@ -403,6 +403,8 @@ class Vclans(models.Model):
     arrivato_al_campo = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
+    arrivato_al_quartiere = models.NullBooleanField(default=None)
+
     route_num = models.IntegerField(db_column='route', null=True)
     #is_ospitante = models.NullBooleanField(default=None)
 
@@ -446,6 +448,17 @@ class Vclans(models.Model):
         return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
     arrivato_al_campo_display.short_description = 'VARCO0'
     arrivato_al_campo_display.allow_tags = True
+
+    def arrivato_al_quartiere_display(self):
+        if self.arrivato_al_quartiere == True:
+            css, button, color = 'success', 'S', '#51a351'
+        elif self.arrivato_al_quartiere == False:
+            css, button, color = 'danger', 'N', 'red'
+        else:
+            css, button, color = 'warning', '?', '#f89406'
+        return format_html('<span class="label label-%s" style="background-color: %s; font-size: 18px; padding: 5px;">%s</span>' % (css, color, button))
+    arrivato_al_quartiere_display.short_description = 'VARCO1'
+    arrivato_al_quartiere_display.allow_tags = True
 
 class HumenSostituzioni(models.Model):
 

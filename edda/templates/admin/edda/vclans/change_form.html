@@ -11,6 +11,9 @@
         {{ block.super }}
         {% if change %}
             {% if original.arrivato_al_campo %}
+                {% if not original.arrivato_al_quartiere %}
+                    <button name="_check_in_quartiere_vclan" href="do-check-in-quartiere-vclan/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO DEL CLAN AL QUARTIERE</button>
+                {% endif %}
                 <button name="_check_in_quartiere" href="do-check-in-quartiere/" class="btn btn-high btn-success bureau-buttons" type="submit">CONFERMA L'ARRIVO DI TUTTI AL QUARTIERE</button>
             {% else %}
                 <button name="_set_arrived_campo" href="do-check-in-campo/" class="btn btn-high btn-info bureau-buttons" type="submit">SEGNA IL CLAN COME ARRIVATO AL CAMPO</button>
@@ -20,6 +23,7 @@
                 <button name="_set_null_arrived_campo" href="do-set-null-arrived-campo/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO AL CAMPO SCONOSCIUTO</button>
             {% endif %}
             <button name="_set_null_arrived_campo" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">ANNULLA ARRIVO DI TUTTI AL QUARTIERE</button>
+            <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere-vclan/" class="btn btn-high btn-warning bureau-buttons" type="submit">ANNULLA ARRIVO AL QUARTIERE DEL CLAN</button>
             <button name="_add_rover_o_scolta" class="btn btn-high btn-info" type="submit">AGGIUNGI UN ROVER O UNA SCOLTA A QUESTO CLAN</button>
             <button name="_print_badge" href="do-vclan-print-badge/" class="btn btn-high btn-success" type="submit">STAMPA BADGE</button>
 

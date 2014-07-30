@@ -469,19 +469,19 @@ class VclansAdmin(admin.ModelAdmin):
     save_on_top = True
 
     list_display = (
-        '__unicode__', 'arrivato_al_campo_display', 'quartiere', 'contrada', 'idgruppo', 'idunitagruppo'
+        '__unicode__', 'arrivato_al_campo_display', 'arrivato_al_quartiere_display',  'quartiere', 'contrada', 'idgruppo', 'idunitagruppo'
     )
 
     fieldsets = (
         (None, {
             'fields': (
                 ('nome', 'quartiere', 'contrada', 'route_num', 'idgruppo', 'idunitagruppo',
-                'regione', 'arrivato_al_campo_display',)
+                'regione', 'arrivato_al_campo_display', 'arrivato_al_quartiere_display')
             )
         }),
     )
 
-    readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione', 'arrivato_al_campo_display',)
+    readonly_fields = ('nome', 'idunitagruppo', 'idgruppo', 'regione', 'arrivato_al_campo_display', 'arrivato_al_quartiere_display')
 
     @only_one_element_allowed
     def arrivati_al_campo(self, request, queryset):
