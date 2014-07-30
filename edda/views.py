@@ -190,7 +190,7 @@ def api_search_vclan(request):
                 'route': friend.route_num,
                 'idvclan': friend.idvclan,
                 'npersone': friend.humen_set.count(),
-                'quartiere': friend.quartiere,
+                'quartiere': friend.quartiere.name,
                 'contrada': friend.contrada,
                 'arrivato': friend.arrivato_al_campo,
             }

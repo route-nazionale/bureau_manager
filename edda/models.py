@@ -406,7 +406,10 @@ class Vclans(models.Model):
     route_num = models.IntegerField(db_column='route', null=True)
     #is_ospitante = models.NullBooleanField(default=None)
 
-    quartiere = models.IntegerField(blank=True, null=True)
+    #quartiere = models.IntegerField(blank=True, null=True)
+    quartiere = models.ForeignKey('Districts', to_field="id", db_column='quartiere',
+        related_name='in_quartiere', verbose_name='quartiere'
+    )
     contrada = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -550,8 +553,8 @@ class Contradas(models.Model):
 class Districts(models.Model):
     name = models.CharField(max_length=255, blank=True)
     color = models.CharField(max_length=255, blank=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
+    #created_at = models.DateTimeField(blank=True, null=True)
+    #updated_at = models.DateTimeField(blank=True, null=True)
     numero = models.IntegerField(blank=True, null=True)
     vincolo_tende = models.IntegerField(blank=True, null=True)
     vincolo_persone = models.IntegerField(blank=True, null=True)
