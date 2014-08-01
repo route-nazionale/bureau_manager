@@ -21,8 +21,52 @@
                 <button name="_set_null_arrived_quartiere" href="do-set-null-arrived-quartiere/" class="btn btn-high btn-warning bureau-buttons" type="submit">IMPOSTA ARRIVO SCONOSCIUTO (ripristina valore iniziale)</button>
             {% endif %}
             <button name="_print_badge" href="do-humen-print-badge/" class="btn btn-high btn-success" type="submit">STAMPA BADGE</button>
+            <button name="_change_password" class="btn btn-high btn-success" data-toggle="modal" data-target="#change-password">CAMBIA PASSWORD</button>
+
+
+<!-- Modal -->
+<div class="modal fade" id="change-password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Chiudi</span></button>
+        <h4 class="modal-title" id="myModalLabel">Inserisci la nuova password:</h4>
+      </div>
+      <div class="modal-body">
+        <div style="display: none;" id="password-ok" class="alert alert-success" role="alert">Password modificata correttamente</div>
+        <input id="clear-password" type="password" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Annulla</button>
+        <button name="_send_password" type="button" class="btn btn-primary">Aggiorna password</button>
+      </div>
+    </div>
+  </div>
+</div>
 
         <script type="text/javascript">
+            $('button[name=_send_password]').click(function (e) {
+                var el = $(e.target);
+                var password = $('#clear-password').val();
+                $.post(
+                  'do-change-password/', 
+                  {'my_dear_cleartext': password})
+                  .done(function(data) {
+                      if (data == 'OK') {
+                        $('#password-ok').fadeIn();
+                        setTimeout(function(){
+                          $('#password-ok').hide();
+                          $('#clear-password').val('');
+                          $('#change-password').modal('hide');
+                        }, 2000);
+                      }
+                      else
+                          alert("Ritorno inaspettato: " + data)
+                  });
+                e.stopPropagation();
+                return false;
+            });
+
             $('button[name=_set_substitution]').click(function (e) {
                 var el = $(e.target);
                 $.post(el.attr('href'), {})
