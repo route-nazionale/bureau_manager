@@ -4,3 +4,4 @@ pika
 mysql-python
 xhtml2pdf
 qrcode
+pycrypto

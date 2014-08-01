@@ -5,12 +5,16 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
 
 
 from edda.models import Vclans, Humen, HumenSostituzioni
 from edda.views_support import HttpJSONResponse, make_pdf_response
+from edda.cryptonite import get_crypto_base64_rn2014
 
-import json
+import json, pika, logging
+
+logger = logging.getLogger(__name__)
 
 def can_update_stato_di_arrivo(user):
     return user.is_superuser or user.groups.filter(name__in=["tesorieri","segreteria"]).count()
@@ -224,3 +228,42 @@ def api_search_vclan(request):
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
+@staff_member_required
+@csrf_exempt
+def change_humen_password(request, pk):
+
+    humen = get_object_or_404(Humen, pk=pk)
+
+    # Step 1: encrypt password
+
+    passwd = request.POST["my_dear_cleartext"]
+    
+    encrypted_password = get_crypto_base64_rn2014(passwd)
+
+
+    # Step 2: send to RabbitMQ following spec on
+    # https://docs.google.com/document/d/1S_mwVnNOIrzbo7gEJlgrmt4w1ZZWSFM0Om5DCTGuJCc/edit#
+
+    routing_key = "humen.password"
+
+    data = json.dumps({
+        "username" : humen.cu,
+        "password" : encrypted_password,
+    })
+
+    if settings.RABBITMQ_ENABLE:
+        RABBITMQ_connection = pika.BlockingConnection(
+            pika.ConnectionParameters(**settings.RABBITMQ)
+        )
+        RABBITMQ_channel = RABBITMQ_connection.channel()
+
+        RABBITMQ_channel.basic_publish(
+            exchange='application', routing_key=routing_key, body=data
+        )
+        RABBITMQ_connection.close()
+
+        logger.debug("[PASSWD UPDATE %s] %s" % (routing_key, data))
+    else:
+        logger.debug("[RABBIT DISABLED: PASSWD UPDATE SIMULATION] %s" % data)
+
+    return HttpResponse("OK")
