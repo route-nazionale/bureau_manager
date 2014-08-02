@@ -433,7 +433,7 @@ class Humen(models.Model):
         final_add = []
         final_remove = []
 
-        pgroup_names = map(lambda x: x[0], self.posix_group_set.values('posixgroup_id'))
+        pgroup_names = map(lambda x: x[0], self.posix_group_set.values('name'))
 
         for gadd in add:
             # update or add groups
@@ -448,20 +448,19 @@ class Humen(models.Model):
         self.posix_group_set.remove(*final_remove)
         self.posix_group_set.add(*final_add)
 
+        routing_key = "humen.groups"
+        data = json.dumps({
+            "username" : self.cu,
+            "add" : add, #original groups sent -> RABBIT is more up-to-date than me
+            "remove" : remove, #original groups sent -> RABBIT is more up-to-date than me
+        })
+
         # SEND TO RABBITMQ
         if settings.RABBITMQ_ENABLE:
 
-            routing_key = "humen.groups"
-            data = json.dumps({
-                "username" : self.cu,
-                "add" : add, #original groups sent -> RABBIT is more up-to-date than me
-                "remove" : remove, #original groups sent -> RABBIT is more up-to-date than me
-            })
             send_to_rabbitmq(routing_key, data)
 
-        logger.INFO("[POSIX GROUP UPDATE] person=%s add=%s remove=%s" % 
-            (self, final_add, final_remove)
-        )
+        logger.info("[UPDATE %s] %s" % (routing_key, data))
         
     def get_posix_groups(self):
         """

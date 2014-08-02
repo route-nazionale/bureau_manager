@@ -277,7 +277,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             elif kind == "remove":
                 verb_kind = "Rimuovi"
 
-            new_fun = lambda request, queryset: fun(request, queryset, kind, group_name)
+            new_fun = lambda self, request, queryset: fun(request, queryset, kind, group_name)
             new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, POSIX_GROUPS.get(name=group_name))
             new_fun.short_description = new_fun.short_description.upper()
             return new_fun
