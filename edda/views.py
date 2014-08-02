@@ -12,6 +12,8 @@ from edda.models import Vclans, Humen, HumenSostituzioni
 from edda.views_support import HttpJSONResponse, make_pdf_response
 from edda.cryptonite import get_crypto_base64_rn2014
 
+from utils import send_to_rabbitmq
+
 import json, pika, logging
 
 logger = logging.getLogger(__name__)
@@ -252,17 +254,9 @@ def change_humen_password(request, pk):
     })
 
     if settings.RABBITMQ_ENABLE:
-        RABBITMQ_connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**settings.RABBITMQ)
-        )
-        RABBITMQ_channel = RABBITMQ_connection.channel()
+        send_to_rabbitmq(routing_key, data)
 
-        RABBITMQ_channel.basic_publish(
-            exchange='application', routing_key=routing_key, body=data
-        )
-        RABBITMQ_connection.close()
-
-        logger.debug("[PASSWD UPDATE %s] %s" % (routing_key, data))
+        logger.debug("[RABBIT PASSWD UPDATE %s] %s" % (routing_key, data))
     else:
         logger.debug("[RABBIT DISABLED: PASSWD UPDATE SIMULATION] %s" % data)
 

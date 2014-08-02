@@ -28,6 +28,8 @@ import qrcode
 import base64
 import StringIO
 
+from utils import send_to_rabbitmq
+
 logger = logging.getLogger(__name__)
 
 class Ruolipartecipante(models.Model):
@@ -696,34 +698,11 @@ if settings.RABBITMQ_ENABLE:
         routing_key = get_rabbitmq_routing_key(sender, instance, created)
 
         if routing_key:
-            #RABBITMQ_SETTINGS
 
-            RABBITMQ_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(**settings.RABBITMQ)
-            )
-            RABBITMQ_channel = RABBITMQ_connection.channel()
-
-            RABBITMQ_channel.basic_publish(
-                exchange='application', routing_key=routing_key, body=data
-            )
-            RABBITMQ_connection.close()
+            send_to_rabbitmq(routing_key, data)
 
             logger.debug("[DB WRITE %s] %s" % (routing_key, data))
         else:
             logger.debug("[NO RABBIT DB WRITE] %s" % data)
 
 
-    # STUB PER LA PROVA DI MANTENERE PERMANENTE LA CONNESSIONE
-    # RABBITMQ_connection = pika.BlockingConnection(
-    #     pika.ConnectionParameters(**settings.RABBITMQ)
-    # )
-    # RABBITMQ_channel = RABBITMQ_connection.channel()
-    # routing_key = 'humen.update'
-    # data='ciao mondo'
-    # RABBITMQ_channel.exchange_declare(
-    #     exchange='application', type='direct'
-    # )
-    # RABBITMQ_channel.basic_publish(
-    #     exchange='application', routing_key=routing_key, body=data
-    # )
-    # RABBITMQ_connection.close()

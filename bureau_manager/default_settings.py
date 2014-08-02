@@ -108,6 +108,11 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR + '/debug.log',
         },
+        'rabbitfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR + '/rabbitmq_send.log',
+        },
         'stdout' : {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -119,6 +124,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'rabbit' : {
+            'handlers': ['rabbitfile'],
+            'level' : 'DEBUG',
+            'propagate': False
+        }
     },
 }
 
