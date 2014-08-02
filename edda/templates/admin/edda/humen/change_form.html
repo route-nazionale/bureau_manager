@@ -3,6 +3,7 @@
 
 {% block extrajs %}
     {{ block.super }}
+{% if original %}
 <script type="text/javascript">
    var posix_group_box = $('#posix_group_box');
    //KO.load(function () {
@@ -23,6 +24,7 @@
 
    //KO: });
 </script>
+{% endif %}
 {% endblock %}
 
 {% block field_sets %}
