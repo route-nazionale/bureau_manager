@@ -30,6 +30,8 @@ import StringIO
 
 from utils import send_to_rabbitmq
 
+import json, urllib2
+
 logger = logging.getLogger(__name__)
 
 class Ruolipartecipante(models.Model):
@@ -47,12 +49,13 @@ class Ruolipartecipante(models.Model):
 
 class PosixGroup(models.Model):
 
-    name = models.CharField(max_length=32, primary_key=True)
-    description = models.CharField(max_length=512, blank=True)
+    name = models.CharField(max_length=32, primary_key=True, db_column="group")
+    description = models.CharField(max_length=512, blank=True, db_column="label")
 
     class Meta:
         verbose_name = "permesso applicazioni"
         verbose_name_plural = "permessi applicazioni"
+        db_table = "posix"
 
     def __unicode__(self):
         rv = self.name
@@ -459,6 +462,30 @@ class Humen(models.Model):
         logger.INFO("[POSIX GROUP UPDATE] person=%s add=%s remove=%s" % 
             (self, final_add, final_remove)
         )
+        
+    def get_posix_groups(self):
+        """
+        Query the REST API for groups belonging to this humen
+        and save it in cache
+        """
+
+        headers = { "Content-Type" : "application/json" }
+        url = settings.REST_URL_GET_CU_GROUPS % {'cu' : self.cu }
+        req = urllib2.Request(url, headers=headers)
+
+        try:
+            response = urllib2.urlopen(req)
+        except urllib2.HTTPError as error:
+            contents = error.read()
+        
+            rv = [u"Errore HTTP nel recupero dei gruppi per %s (%s)" % (self.cu, contents)]
+        else:
+            contents = response.read()
+            d = json.loads(contents)
+            rv = d["groups"]
+
+        return rv
+
         
 #---------------------------------------------------------------------------------
 
