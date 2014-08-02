@@ -261,3 +261,9 @@ def change_humen_password(request, pk):
         logger.debug("[RABBIT DISABLED: PASSWD UPDATE SIMULATION] %s" % data)
 
     return HttpResponse("OK")
+
+@login_required
+def get_posix_groups(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+    return HttpJSONResponse(hu.get_posix_groups())

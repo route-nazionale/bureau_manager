@@ -6,7 +6,7 @@
                 <span class="description">{{ fieldset.description|safe }}</span>
             {% endif %}
         </h2>{% endif %}
-    {% if forloop.first %}
+    {% if original and forloop.first %}
         <div style="border: 1px solid lightgrey; border-radius: 0.5em; position:absolute; display: float; bottom: 1em; right:1em; padding:0.2em 0.8em">
   <h4 style="border-bottom: 1px solid lightgrey; align:center; margin-bottom:1.5em;">Autorizzazioni</h4>
   <div id="posix_group_box"><img src="/static/edda/preloader.gif" /></div>

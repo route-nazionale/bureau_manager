@@ -1,6 +1,37 @@
 {% extends "admin/edda/change_form.html" %}
 {% load i18n %}
 
+{% block extrajs %}
+    {{ block.super }}
+<script type="text/javascript">
+   var posix_group_box = $('#posix_group_box');
+   //KO.load(function () {
+
+        var url = "{% url 'edda.views.get_posix_groups' pk=original.pk %}";
+        
+        $.get(url, { dataType : 'json' }).done(function(data) {
+            $(posix_group_box).text('');
+            if (data.length == 0) {
+                $(posix_group_box).text("Nessuna autorizzazione per lui")
+            } else {
+                var i=0;
+                for (i; i<data.length; i++) {
+                    $(posix_group_box).append('<p>' + data[i] + '</p>');
+                }
+            }
+        })
+
+   //KO: });
+</script>
+{% endblock %}
+
+{% block field_sets %}
+    {% for fieldset in adminform %}
+      {% include "admin/includes/humen_fieldset.html" %}
+    {% endfor %}
+{% endblock %}
+
+
 {% block submit_buttons_bottom %}
     {% if not user.is_readonly %}
         {{ block.super }}
@@ -110,6 +141,22 @@
                 e.stopPropagation();
                 return false;
             });
+
+           $('#posix_group_box').load(function () {
+                var url = "{% url 'edda.views.get_posix_groups' pk=original.pk %}";
+                //url = url.replace("%(cu)s", $(".field-cu .controls").text());
+                
+                $.get(url, { dataType : 'json' }).done(function(data) {
+                    if (data.length == 0) {
+                        $(this).text("Nessuna autorizzazione per lui")
+                    } else {
+                        var i=0;
+                        for (i; i<data.length; i++) {
+                            $(this).append('<p>' + data[i] + '</p>');
+                        }
+                    }
+                })
+           });
         </script>
         {% endif %}
     {% endif %}

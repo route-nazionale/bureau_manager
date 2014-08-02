@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^admin/edda/humen/(?P<pk>\d+)/do-prepare-substitution/', "edda.views.humen_do_prepare_substitution"),
     url(r'^admin/edda/humen/(?P<pk>\d+)/do-humen-print-badge/', "edda.views.humen_do_print_badge"),
     url(r'^admin/edda/humen/(?P<pk>\d+)/do-change-password/', "edda.views.change_humen_password"),
+    url(r'^admin/edda/humen/(?P<pk>\d+)/get-posix-groups/', "edda.views.get_posix_groups"),
 
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-check-in-campo/', "edda.views.vclans_do_check_in_campo"),
     url(r'^admin/edda/vclans/(?P<pk>\d+)/do-check-in-quartiere/', "edda.views.vclans_do_check_in_quartiere"),
