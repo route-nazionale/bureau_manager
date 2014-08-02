@@ -446,7 +446,7 @@ class Humen(models.Model):
         self.posix_group_set.add(*final_add)
 
         # SEND TO RABBITMQ
-        if settings.RABBITMQ_ENABLE
+        if settings.RABBITMQ_ENABLE:
 
             routing_key = "humen.groups"
             data = json.dumps({
