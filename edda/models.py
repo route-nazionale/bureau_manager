@@ -451,8 +451,8 @@ class Humen(models.Model):
             routing_key = "humen.groups"
             data = json.dumps({
                 "username" : self.cu,
-                "add" : final_add,
-                "remove" : final_remove,
+                "add" : add, #original groups sent -> RABBIT is more up-to-date than me
+                "remove" : remove, #original groups sent -> RABBIT is more up-to-date than me
             })
             send_to_rabbitmq(routing_key, data)
 
