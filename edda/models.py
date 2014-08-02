@@ -45,6 +45,32 @@ class Ruolipartecipante(models.Model):
 
 #--------------------------------------------------------------------------------
 
+class PosixGroup(models.Model):
+
+    name = models.CharField(max_length=32, primary_key=True)
+    description = models.CharField(max_length=512, blank=True)
+
+    class Meta:
+        verbose_name = "permesso applicazioni"
+        verbose_name_plural = "permessi applicazioni"
+
+    def __unicode__(self):
+        rv = self.name
+        if self.description:
+            rv += u" (=%s)" % self.description
+        return rv
+
+#PER ORA NO: class HumenPosixGroupMap(models.Model):
+#
+#    posix_group = models.ForeignKey(PosixGroup)
+#    humen = models.ForeignKey("Humen")
+#
+#    class Meta:
+#        verbose_name = "corrispondenza persona -> permesso"
+#        verbose_name_plural = "corrispondenze persone -> permessi"
+#
+    
+#--------------------------------------------------------------------------------
 
 class Humen(models.Model):
 
@@ -223,6 +249,11 @@ class Humen(models.Model):
     arrivato_al_quartiere = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
+    posix_group_set = models.ManyToManyField(PosixGroup, 
+        null=True, blank=True, related_name="humen_set",
+        #through=HumenPosixGroupMap
+    )
+
     class Meta:
         #managed = False
         db_table = 'humen'
@@ -390,6 +421,46 @@ class Humen(models.Model):
       else:
           new_num = '0'
       return HumenBadge.objects.create(humen=self, code=self.cu+'-'+new_num, is_valid=True)
+
+    def update_posix_groups(self, add=[], remove=[]):
+        """
+        Update or (add or remove) posix groups
+        """
+
+        final_add = []
+        final_remove = []
+
+        pgroup_names = map(lambda x: x[0], self.posix_group_set.values('posixgroup_id'))
+
+        for gadd in add:
+            # update or add groups
+            if gadd not in pgroup_names:
+                final_add.append(gadd)
+
+        for gdel in remove:
+            # update or remove groups
+            if gdel in pgroup_names:
+                final_remove.append(gdel)
+
+        self.posix_group_set.remove(*final_remove)
+        self.posix_group_set.add(*final_add)
+
+        # SEND TO RABBITMQ
+        if settings.RABBITMQ_ENABLE
+
+            routing_key = "humen.groups"
+            data = json.dumps({
+                "username" : self.cu,
+                "add" : final_add,
+                "remove" : final_remove,
+            })
+            send_to_rabbitmq(routing_key, data)
+
+        logger.INFO("[POSIX GROUP UPDATE] person=%s add=%s remove=%s" % 
+            (self, final_add, final_remove)
+        )
+        
+#---------------------------------------------------------------------------------
 
 class Vclans(models.Model):
 
