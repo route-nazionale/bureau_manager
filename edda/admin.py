@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
-from edda.models import HumenBadge
+from edda.models import HumenBadge, PosixGroup
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 from edda.views_support import make_pdf_response
 
@@ -12,6 +12,8 @@ from django import forms
 from django.core.urlresolvers import reverse
 
 import copy
+
+POSIX_GROUPS = PosixGroup.objects.all()
 
 #--------------------------------------------------------------------------------
 # helper functions and decorators
@@ -231,6 +233,13 @@ class BaseHumenAdmin(admin.ModelAdmin):
         else:
             actions = super(BaseHumenAdmin, self).get_actions(request)
             del actions['delete_selected']
+
+            # ACTIONS TO MANAGE POSIX GROUPS
+            for pgroup in POSIX_GROUPS:
+                for kind in ["add", "remove"]:
+                    k = "action_posix_group_%s_%s" % (kind, pgroup.name.replace('.','__'))
+                    k_fun = getattr(self, k)
+                    actions[k] = (k_fun, k, k_fun.short_description)
         return actions
 
     def has_add_permission(self, request):
@@ -241,6 +250,42 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return False
 
     # End wrap readonly permissions
+
+    # POSIX GROUP ACTIONS
+
+    def _do_action_posix_group(self, request, queryset, kind, group_name):
+        if kind == "add":
+            add = [group_name]
+            remove = []
+        elif kind == "remove":
+            add = []
+            remove = [group_name]
+
+        for hu in queryset:
+            hu.update_posix_groups(add=add, remove=remove)
+
+
+    def __getattr__(self, attr_name, default=None):
+        if attr_name.startswith('action_posix_group_'):
+            # recall __getattr__ to get the real method
+            # WARNING: do not call this method action_posix_group_xxxxx pay with an infinite recursion otherwise
+            fun = self._do_action_posix_group 
+            kind, group_name = attr_name[len('action_posix_group_'):].split('_',1)
+            group_name = group_name.replace('__','.')
+            if kind == "add":
+                verb_kind = "Aggiungi"
+            elif kind == "remove":
+                verb_kind = "Rimuovi"
+
+            new_fun = lambda request, queryset: fun(request, queryset, kind, group_name)
+            new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, POSIX_GROUPS.get(name=group_name))
+            new_fun.short_description = new_fun.short_description.upper()
+            return new_fun
+
+        else:
+            return super(BaseHumenAdmin, self).__getattr__(attr_name, default)
+
+    # END POSIX GROUP ACTIONS
 
     def get_form(self, request, obj=None):
         """
