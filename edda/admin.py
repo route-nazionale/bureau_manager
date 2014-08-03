@@ -150,13 +150,15 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'vclan__contrada',
     ]
 
-    base_readonly_fields = ['codice_censimento', 'cu', 
+    base_readonly_fields = ['codice_censimento', 'cu',
         'periodo_partecipazione', 'quartiere', 'contrada'
     ]
 
     hyperdynamic_fields = [
-        'arrivato_al_campo_display', 'arrivato_al_quartiere_display', 
-        'sostituito_da'
+        'arrivato_al_campo_display', 'arrivato_al_quartiere_display',
+        'sostituito_da',
+        'quartiere',
+        'contrada',
     ]
 
     #DEBUG list_per_page = 10
@@ -168,7 +170,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 ('scout'),
                 ('agesci'),
                 ('classe_presenza'),
-                ('cu',), 'quartiere', 'contrada',
+                ('cu',),
             ],
             'classes' : ('wide',)
         }),
@@ -269,7 +271,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         if attr_name.startswith('action_posix_group_'):
             # recall __getattr__ to get the real method
             # WARNING: do not call this method action_posix_group_xxxxx pay with an infinite recursion otherwise
-            fun = self._do_action_posix_group 
+            fun = self._do_action_posix_group
             kind, group_name = attr_name[len('action_posix_group_'):].split('_',1)
             group_name = group_name.replace('__','.')
             if kind == "add":
@@ -303,12 +305,12 @@ class BaseHumenAdmin(admin.ModelAdmin):
                     self.base_readonly_fields.remove('vclan')
             else:
                 self.base_readonly_fields.append('vclan')
-            
+
         form = super(BaseHumenAdmin, self).get_form(request, obj)
         if form.base_fields.get('vclan'):
             form.base_fields['vclan'].widget.can_add_related = False
         return form
-            
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # if we are changing a person and we are not a superuser
         if not request.user.is_superuser and self._obj and db_field.name == "vclan":
@@ -327,7 +329,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         for f in self.hyperdynamic_fields:
             if f not in self.base_readonly_fields:
                 self.base_readonly_fields.append(f)
-                self.fieldsets[0][1]['fields'].append(f)
+                if f in self.fieldsets[0][1]['fields']:
+                    self.fieldsets[0][1]['fields'].append(f)
 
         if request.user.is_readonly():
             self.readonly_fields = self.base_readonly_fields + [
@@ -360,7 +363,8 @@ class BaseHumenAdmin(admin.ModelAdmin):
         for f in self.hyperdynamic_fields:
             if f in self.base_readonly_fields:
                 self.base_readonly_fields.remove(f)
-                self.fieldsets[0][1]['fields'].remove(f)
+                if f in self.fieldsets[0][1]['fields']:
+                    self.fieldsets[0][1]['fields'].remove(f)
 
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
@@ -382,7 +386,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
     non_arrivati_al_quartiere.short_description = "REGISTRA CHE LE PERSONE SELEZIONATE NON VENGONO"
 
     def stampa_badge(self, request, queryset):
-        
+
         badge_qs = []
         for hu in queryset:
             badge_qs.append(hu.get_new_badge())
@@ -575,7 +579,7 @@ class VclansAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not request.user.is_readonly()
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
 
