@@ -1,5 +1,4 @@
 #!/usr/bin/php5
-
 <?php
 
 include('Crypt/AES.php');
