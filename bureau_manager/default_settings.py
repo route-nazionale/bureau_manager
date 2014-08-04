@@ -24,7 +24,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
