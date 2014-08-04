@@ -15,9 +15,14 @@
             if (data.length == 0) {
                 $(posix_group_box).text("Nessuna autorizzazione per lui")
             } else {
-                var i=0;
-                for (i; i<data.length; i++) {
-                    $(posix_group_box).append('<p>' + data[i] + '</p>');
+                for (var k in data) {
+                    v = data[k];
+                    var checked = "";
+                    if (v)
+                        checked = 'checked="checked"'
+                    var auth_line = '<input type="checkbox" ' + checked +' value="' + k + '"/>&nbsp;'
+                    auth_line += k;
+                    $(posix_group_box).append('<p>' + auth_line + '</p>');
                 }
             }
         })

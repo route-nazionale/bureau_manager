@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
-from edda.models import HumenBadge, PosixGroup
+from edda.models import HumenBadge, PosixGroup, ALL_POSIX_GROUPS
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 from edda.models import HumenServices
 from edda.views_support import make_pdf_response
@@ -13,8 +13,6 @@ from django import forms
 from django.core.urlresolvers import reverse
 
 import copy
-
-POSIX_GROUPS = PosixGroup.objects.all()
 
 #--------------------------------------------------------------------------------
 # helper functions and decorators
@@ -242,7 +240,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             del actions['delete_selected']
 
             # ACTIONS TO MANAGE POSIX GROUPS
-            for pgroup in POSIX_GROUPS:
+            for pgroup in ALL_POSIX_GROUPS:
                 for kind in ["add", "remove"]:
                     k = "action_posix_group_%s_%s" % (kind, pgroup.name.replace('.','__'))
                     k_fun = getattr(self, k)
@@ -285,7 +283,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 verb_kind = "Rimuovi"
 
             new_fun = lambda self, request, queryset: fun(request, queryset, kind, group_name)
-            new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, POSIX_GROUPS.get(name=group_name))
+            new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, ALL_POSIX_GROUPS.get(name=group_name))
             new_fun.short_description = new_fun.short_description.upper()
             return new_fun
 

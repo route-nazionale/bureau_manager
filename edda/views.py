@@ -10,12 +10,14 @@ from django.utils.timezone import now
 
 
 from edda.models import Vclans, Humen, HumenSostituzioni
+from edda.models import ALL_POSIX_GROUPS
 from edda.views_support import HttpJSONResponse, make_pdf_response
 from edda.cryptonite import get_crypto_base64_rn2014
 
 from utils import send_to_rabbitmq
 
 import json, pika, logging
+from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
@@ -277,4 +279,9 @@ def change_humen_password(request, pk):
 def get_posix_groups(request, pk):
 
     hu = get_object_or_404(Humen, pk=pk)
-    return HttpJSONResponse(hu.get_posix_groups())
+    hu_groups = hu.get_posix_groups()
+    rv = OrderedDict()
+
+    for pgroup in ALL_POSIX_GROUPS:
+        rv[unicode(pgroup)] = pgroup.name in hu_groups
+    return HttpJSONResponse(rv)
