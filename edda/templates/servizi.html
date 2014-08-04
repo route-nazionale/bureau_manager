@@ -1,0 +1,29 @@
+<style>
+  @page {
+    size: a4 portrait;
+    margin: 40px;
+    border: 0px solid white;
+    font-size: 13px;
+  }
+  td {
+    border: 1px solid black;
+    padding: 2px;
+  }
+</style>
+<table>
+  <tr>
+    <th>Nome</th>
+    <th>Clan</th>
+    <th>Quartiere</th>
+    <th>Contrada</th>
+    <th>Servizio</th>
+{% for p in qs %}
+  <tr>
+    <td>{{ p.nome }} {{ p.cognome }}</td>
+    <td>{{ p.vclan }}</td>
+    <td>{{ p.vclan.quartiere }}</td>
+    <td>{{ p.vclan.contrada }}</td>
+    <td>{{ p.service }}</td>
+  </tr>
+{% endfor %}
+</table>

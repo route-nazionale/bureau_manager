@@ -219,6 +219,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'arrivati_al_quartiere',
         'non_arrivati_al_quartiere',
         'stampa_badge',
+        'stampa_servizi',
     ]
 
     change_list_template = "admin/change_list_pagination_on_top.html"
@@ -396,6 +397,14 @@ class BaseHumenAdmin(admin.ModelAdmin):
             badge_qs.append(hu.get_new_badge())
         return make_pdf_response({ 'qs' : badge_qs }, 'badge_qs.html')
     stampa_badge.short_description = 'STAMPA BADGE DELLE PERSONE SELEZIONATE'
+    
+    def stampa_servizi(self, request, queryset):
+
+        servizi = []
+        for hu in queryset:
+            servizi.append(hu)
+        return make_pdf_response({ 'qs' : servizi }, 'servizi.html')
+    stampa_servizi.short_description = 'STAMPA I SERVIZI ASSEGNATI ALLE PERSONE SELEZIONATE'
 
     def my_class(self, obj):
 
