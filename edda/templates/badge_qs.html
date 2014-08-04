@@ -1,12 +1,43 @@
 <style>
+  @page {
+    margin: 40px;
+    border: 0px solid white;
+  }
   p {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     font-size: 22px;
   }
+  
+  .uno {
+    display: none;
+  }
 </style>
+<table>
 {% for badge in qs %}
-  <p class="nome">{{badge.humen_nome}}</p>
-  <p class="cognome">{{badge.humen_cognome}}</p>
-  <p class="clan">{{badge.humen_vclan}}</p>
-  <p class="code">{{badge.code}}</p>
-  <img class="qrcode" src="{{ badge.qrcode }}">
+  {% if forloop.counter|divisibleby:2 %} <!-- destra -->
+      <td style="margin-left: 50px;">
+  {% else %} <!-- sinistra -->
+    
+    <tr class="{% cycle 'uno' 'due' %}">
+      <td style="line-height: 350px;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
+  {% endif %}
+        <p class="nome">{{badge.humen_nome}}</p>
+        <p class="cognome">{{badge.humen_cognome}}</p>
+        <p class="clan">{{badge.humen_vclan}}</p>
+        <img class="qrcode" src="{{ badge.qrcode }}" style="height:200px;">
+        <p class="code">{{badge.code}}</p>
+      </td>
+  {% if forloop.counter|divisibleby:2 %} <!-- destra -->
+    </tr>
+  {% else %} <!-- sinistra -->
+  {% endif %}
 {% endfor %}
+</table>
+
+        <!-- <p style="line-height: 70px;">&nbsp;</p> -->

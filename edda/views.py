@@ -158,7 +158,7 @@ def humen_do_print_badge(request, pk):
 
     hu = get_object_or_404(Humen, pk=pk)
 
-    return make_pdf_response({ 'qs' :[hu.get_new_badge()] }, 'badge_qs.html')
+    return make_pdf_response({ 'qs' :[hu.get_new_badge()] }, 'badge_qs_single.html')
 
 
 @csrf_exempt

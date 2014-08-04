@@ -1,0 +1,25 @@
+<style>
+  @page {
+    size: a6 portrait;
+    margin: 40px;
+    border: 0px solid white;
+  }
+  p {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 22px;
+  }
+  
+  .uno {
+    display: none;
+  }
+</style>
+{% for badge in qs %}
+  <p class="nome">{{badge.humen_nome}}</p>
+  <p class="cognome">{{badge.humen_cognome}}</p>
+  <p class="clan">{{badge.humen_vclan}}</p>
+  <img class="qrcode" src="{{ badge.qrcode }}" style="height:200px;">
+  <p class="code">{{badge.code}}</p>
+{% endfor %}
