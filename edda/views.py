@@ -1,4 +1,4 @@
-from django.views.decorators.csrf import csrf_exempt, require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
