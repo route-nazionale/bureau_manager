@@ -32,7 +32,23 @@
                     }
                 }
             }
-        })
+        });
+
+    $('#posix_group_update_button').click(function (e) {
+        var data = {};
+        $('#posix_group_box input').each(function (i) {
+            $(this).prop('value');
+            if ($(this).prop('checked') == 'checked'):
+                data[k] = true;
+            else
+                data[k] = false;
+        });
+        $.post(url, data, { dataType: 'json'}).done(
+            alert("Aggiornamento dei gruppi effettuato con successo")
+        );
+        return false;
+    })
+    
 
    //KO: });
 </script>

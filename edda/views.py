@@ -1,4 +1,4 @@
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, require_POST
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -282,6 +282,34 @@ def get_posix_groups(request, pk):
     hu_groups = hu.get_posix_groups()
     rv = OrderedDict()
 
-    for pgroup in ALL_POSIX_GROUPS:
-        rv[unicode(pgroup)] = pgroup.name in hu_groups
+    for pgroup in ALL_POSIX_GROUPS.exclude(name="bureau.user"):
+        if request.user.is_superuser or pgroup.name.startswith('bureau'):
+            rv[unicode(pgroup)] = pgroup.name in hu_groups
     return HttpJSONResponse(rv)
+
+
+@staff_member_required
+@csrf_exempt
+@require_POST
+def update_humen_groups(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+
+    try:
+        posix_groups_auth = json.loads(request.POST.body)
+    except Exception as e:
+        return HttpResponse("KO: json loads of body")
+
+    add = []
+    remove = []
+    for k,v in posix_groups_auth.items():
+        if v:
+            add.append(k)
+        else:
+            remove.append(k)
+    
+    hu.update_posix_groups(add=add, remove=remove)
+    return HttpResponse("OK")
+    
+    
+
