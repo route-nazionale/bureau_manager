@@ -279,15 +279,17 @@ class Humen(models.Model):
     arrivato_al_quartiere = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
-    posix_group_set = models.ManyToManyField(PosixGroup,
-        null=True, blank=True, related_name="humen_set",
-        #through=HumenPosixGroupMap
-    )
+    #posix_group_set = models.ManyToManyField(PosixGroup,
+    #    null=True, blank=True, related_name="humen_set",
+    #    #through=HumenPosixGroupMap
+    #)
 
 
     # Servizi -----------------------------------------
 
-    service = models.ForeignKey(HumenServices, blank=True, null=True, verbose_name='Servizio')
+    service = models.ForeignKey(HumenServices, blank=True, null=True, 
+        verbose_name='servizio'
+    )
 
 
     class Meta:
@@ -466,7 +468,7 @@ class Humen(models.Model):
         final_add = []
         final_remove = []
 
-        pgroup_names = map(lambda x: x[0], self.posix_group_set.values('name'))
+        pgroup_names = [] # map(lambda x: x[0], self.posix_group_set.values('name'))
 
         for gadd in add:
             # update or add groups
@@ -478,8 +480,8 @@ class Humen(models.Model):
             if gdel in pgroup_names:
                 final_remove.append(gdel)
 
-        self.posix_group_set.remove(*final_remove)
-        self.posix_group_set.add(*final_add)
+        #self.posix_group_set.remove(*final_remove)
+        #self.posix_group_set.add(*final_add)
 
         routing_key = "humen.groups"
         data = json.dumps({
