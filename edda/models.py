@@ -36,6 +36,7 @@ logger = logging.getLogger('pippo')
 
 class Ruolipartecipante(models.Model):
 
+    code = models.IntegerField(primary_key=True, db_column="id")
     value = models.CharField(max_length=25)
 
     class Meta:
