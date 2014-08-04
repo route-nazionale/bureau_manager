@@ -327,12 +327,13 @@ class BaseHumenAdmin(admin.ModelAdmin):
     #add_humen.short_description = 'Aggiungi Persona'
 
     def change_view(self, request, *args, **kw):
-        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+        if request.user.is_readonly():
+            self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
         for f in self.hyperdynamic_fields:
             if f not in self.base_readonly_fields:
                 self.base_readonly_fields.append(f)
-                if f in self.fieldsets[0][1]['fields']:
+                if f not in self.fieldsets[0][1]['fields']:
                     self.fieldsets[0][1]['fields'].append(f)
 
         if request.user.is_readonly():
@@ -360,7 +361,9 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
     def add_view(self, request, *args, **kw):
-        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+
+        if request.user.is_readonly():
+            self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
         # Clean an "add form"
         for f in self.hyperdynamic_fields:
