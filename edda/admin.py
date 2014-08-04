@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
-from edda.models import HumenBadge, PosixGroup
+from edda.models import HumenBadge, PosixGroup, ALL_POSIX_GROUPS
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
 from edda.models import HumenServices
 from edda.views_support import make_pdf_response
@@ -13,8 +13,6 @@ from django import forms
 from django.core.urlresolvers import reverse
 
 import copy
-
-POSIX_GROUPS = PosixGroup.objects.all()
 
 #--------------------------------------------------------------------------------
 # helper functions and decorators
@@ -243,7 +241,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             del actions['delete_selected']
 
             # ACTIONS TO MANAGE POSIX GROUPS
-            for pgroup in POSIX_GROUPS:
+            for pgroup in ALL_POSIX_GROUPS:
                 for kind in ["add", "remove"]:
                     k = "action_posix_group_%s_%s" % (kind, pgroup.name.replace('.','__'))
                     k_fun = getattr(self, k)
@@ -286,7 +284,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 verb_kind = "Rimuovi"
 
             new_fun = lambda self, request, queryset: fun(request, queryset, kind, group_name)
-            new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, POSIX_GROUPS.get(name=group_name))
+            new_fun.short_description = "*** autorizzazione: %s %s" % (verb_kind, ALL_POSIX_GROUPS.get(name=group_name))
             new_fun.short_description = new_fun.short_description.upper()
             return new_fun
 
@@ -330,12 +328,13 @@ class BaseHumenAdmin(admin.ModelAdmin):
     #add_humen.short_description = 'Aggiungi Persona'
 
     def change_view(self, request, *args, **kw):
-        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+        if request.user.is_readonly():
+            self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
         for f in self.hyperdynamic_fields:
             if f not in self.base_readonly_fields:
                 self.base_readonly_fields.append(f)
-                if f in self.fieldsets[0][1]['fields']:
+                if f not in self.fieldsets[0][1]['fields']:
                     self.fieldsets[0][1]['fields'].append(f)
 
         if request.user.is_readonly():
@@ -363,7 +362,9 @@ class BaseHumenAdmin(admin.ModelAdmin):
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
     def add_view(self, request, *args, **kw):
-        self.message_user(request, "[NOTA] potremmo modificare (x migliorare) la posizione e la presentazione dei campi", level=messages.WARNING)
+
+        if request.user.is_readonly():
+            self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
         # Clean an "add form"
         for f in self.hyperdynamic_fields:

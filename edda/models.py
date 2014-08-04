@@ -63,6 +63,8 @@ class PosixGroup(models.Model):
             rv += u" (=%s)" % self.description
         return rv
 
+ALL_POSIX_GROUPS = PosixGroup.objects.all()
+
 #PER ORA NO: class HumenPosixGroupMap(models.Model):
 #
 #    posix_group = models.ForeignKey(PosixGroup)
