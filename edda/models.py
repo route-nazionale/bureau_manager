@@ -92,6 +92,10 @@ class HumenServices(models.Model):
 
 class Humen(models.Model):
 
+    SESSO_CHOICES = (
+        ('M', 'Maschio'),
+        ('F', 'Femmina'),
+    )
     cu = models.CharField(max_length=255, blank=True,
         verbose_name='codice unico', help_text='', null=True, unique=True
     )
@@ -118,7 +122,8 @@ class Humen(models.Model):
         verbose_name='cognome', help_text='', null=True
     )
     sesso = models.CharField(max_length=255, blank=True,
-        verbose_name='sesso', help_text='', null=True
+        verbose_name='sesso', help_text='', null=True,
+        choices=SESSO_CHOICES
     )
     data_nascita = models.DateField(null=True,
         verbose_name='data di nascita', help_text=''
