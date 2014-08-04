@@ -18,11 +18,18 @@
                 for (var k in data) {
                     v = data[k];
                     var checked = "";
+                    /*FUTURE -- update posix groups in person detail page
                     if (v)
-                        checked = 'checked="checked"'
-                    var auth_line = '<input type="checkbox" ' + checked +' value="' + k + '"/>&nbsp;'
-                    auth_line += k;
-                    $(posix_group_box).append('<p>' + auth_line + '</p>');
+                         checked = 'checked="checked"'
+                     var auth_line = '<input type="checkbox" ' + checked +' value="' + k + '"/>&nbsp;'
+                     auth_line += k;
+                     $(posix_group_box).append('<p>' + auth_line + '</p>');*/
+
+                    //=== READONLY POSIX GROUP NOW ====
+                    if (v) {
+                        var auth_line = k;
+                        $(posix_group_box).append('<p>' + auth_line + '</p>');
+                    }
                 }
             }
         })
