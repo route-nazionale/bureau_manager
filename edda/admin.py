@@ -152,7 +152,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu',
-        'periodo_partecipazione', 'quartiere', 'contrada'
+        'quartiere', 'contrada'
     ]
 
     hyperdynamic_fields = [
