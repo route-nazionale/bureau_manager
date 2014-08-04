@@ -4,7 +4,7 @@ from django.conf import settings
 
 from Crypto.Cipher import AES
 import base64
-import os
+import os, subprocess
 
 BLOCK_SIZE = 32
 
@@ -34,6 +34,7 @@ fun_pad = none_pad
 # BLOCK_SIZE = 32
 
 def get_crypto_base64_rn2014(message):
+    raise NotImplementedError("WARNING: We do crypting works in edda/do_shitting_crypt.php for incompatible encryption or misunderstanding")
 
     # AAA: get keys from database "config" ?!?
 
@@ -48,3 +49,11 @@ def get_crypto_base64_rn2014(message):
     obj = AES.new(KEY, AES.MODE_CBC, IV)
     ciphertext = obj.encrypt(fun_pad(BLOCK_SIZE,message))
     return base64.b64encode(ciphertext)
+
+def get_crypto_base64_rn2014(message):
+
+    return subprocess.check_output([
+        'edda/do_shitting_crypt.php', message, settings.CRYPTO_KEY, settings.CRYPTO_KEY_IV
+    ])
+
+
