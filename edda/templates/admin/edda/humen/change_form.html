@@ -102,20 +102,22 @@
                     var win = window.open('do-humen-print-badge/', '_blank');
                     win.focus();
                 } 
-                $.post("do-check-in-quartiere/", {})
-                    .done(function(data) {
-                        if (data != "OK") {
-                            alert("Non hai i permessi necessari per eseguire l'operazione");
-                        } else {
-                            if(el.attr('name') == 'check-in-no')
-                              alert('Check-in effettuato! Attendere che la pagina si ricarichi...');
-                            $('#check-in').modal('hide');
-                            window.location.reload();
-                        }
-                    })
-                    .fail(function(data) {
-                        alert("Non hai i permessi necessari per eseguire l'operazione");
-                    });
+                $.post("increment-badge/", {}, function() {
+                  $.post("do-check-in-quartiere/", {})
+                      .done(function(data) {
+                          if (data != "OK") {
+                              alert("Non hai i permessi necessari per eseguire l'operazione");
+                          } else {
+                              if(el.attr('name') == 'check-in-no')
+                                alert('Check-in effettuato! Attendere che la pagina si ricarichi...');
+                              $('#check-in').modal('hide');
+                              window.location.reload();
+                          }
+                      })
+                      .fail(function(data) {
+                          alert("Non hai i permessi necessari per eseguire l'operazione");
+                      });
+                });
             
                 e.stopPropagation();
                 return false;

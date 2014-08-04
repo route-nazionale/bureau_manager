@@ -163,6 +163,14 @@ def humen_do_print_badge(request, pk):
 
     return make_pdf_response({ 'qs' :[hu.get_new_badge()] }, 'badge_qs_single.html')
 
+@csrf_exempt
+@user_passes_test(can_print_badge)
+def humen_increment_badge(request, pk):
+
+    hu = get_object_or_404(Humen, pk=pk)
+    hu.get_new_badge()
+
+    return HttpResponse('OK')
 
 @csrf_exempt
 @user_passes_test(can_print_badge)
