@@ -79,14 +79,18 @@ class HumenServices(models.Model):
 
     name = models.CharField(primary_key=True, max_length=127)
 
-    def __unicode__(self):
-        return self.name
-
-    class Meta():
+    class Meta:
         db_table = 'humen_services'
         ordering = ('name',)
         verbose_name = 'servizio'
         verbose_name_plural = 'servizi'
+
+    def __unicode__(self):
+        return self.name
+
+    @property
+    def n_humen(self):
+        return self.humen_set.count() 
 
 #--------------------------------------------------------------------------------
 

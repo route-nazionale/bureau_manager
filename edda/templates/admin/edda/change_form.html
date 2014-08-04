@@ -1,6 +1,13 @@
 {% extends "admin/change_form.html" %}
 {# Here we put some common javascript - csrftoken... #}
 
+{% block extrahead %}
+    <style type="text/css">
+        tr.add-row : { display:none };
+    </style>
+{% endblock %}
+
+
 {% block extrajs %}
     
     <script type="text/javascript">

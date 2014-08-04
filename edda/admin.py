@@ -174,6 +174,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
                 ('agesci'),
                 ('classe_presenza'),
                 ('cu',),
+                ('service',),
             ],
             'classes' : ('wide',)
         }),
@@ -634,7 +635,12 @@ class HumenBadgeAdmin(admin.ModelAdmin):
 
 class HumenServicesAdmin(admin.ModelAdmin):
 
-    list_display = ('name',)
+    list_display = ('name', 'n_humen',)
+
+    inlines = [ HumenInline ] 
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 admin.site.register(Humen, BaseHumenAdmin)
 admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)
