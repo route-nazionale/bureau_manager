@@ -32,7 +32,7 @@ from utils import send_to_rabbitmq
 
 import json, urllib2
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('pippo')
 
 class Ruolipartecipante(models.Model):
 
