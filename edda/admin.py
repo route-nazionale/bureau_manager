@@ -214,6 +214,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             ),
             #'classes' : ('wide',),
         }),
+        ('Note', {'fields': ('note',)}),
     )
     actions = [
         'arrivati_al_quartiere',
