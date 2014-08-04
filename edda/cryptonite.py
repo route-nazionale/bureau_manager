@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from django.conf import settings
+
 from Crypto.Cipher import AES
 import base64
 import os
@@ -29,10 +31,10 @@ def get_crypto_base64_rn2014(message):
     # AAA: get keys from database "config" ?!?
 
     # 32
-    KEY = base64.b64decode('TVkwNVVreVpJak5yTWtVZUYwcTRxeXE5RllCcXZuM0U=')
+    KEY = base64.b64decode(settings.CRYPTO_KEY)
 
     # 16
-    IV = base64.b64decode('aE5RaTRTTmJTNnFuSXFRQQ==')
+    IV = base64.b64decode(settings.CRYPTO_KEY_IV)
 
     # END AAA
 

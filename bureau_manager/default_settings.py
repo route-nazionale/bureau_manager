@@ -150,3 +150,5 @@ RABBITMQ = {
 
 REST_URL_GET_CU_GROUPS = "https://172.16.10.141/users/%(cu)s/groups"
 
+CRYPTO_KEY = ''
+CRYPTO_KEY_IV = ''
