@@ -5,6 +5,7 @@ from django.contrib import messages
 from edda.models import Humen, Periodipartecipaziones, HumenSostituzioni
 from edda.models import HumenBadge, PosixGroup
 from edda.models import RSHumen, ChiefHumen, Routes, Vclans
+from edda.models import HumenServices
 from edda.views_support import make_pdf_response
 
 from django.http import HttpResponseRedirect
@@ -122,6 +123,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'arrivato_al_campo_display',
         'arrivato_al_quartiere_display',
         'ruolo',
+        'service',
         'vclan',
         'cu',
         'nome',
@@ -148,6 +150,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
         'arrivato_al_quartiere',
         'vclan__quartiere',
         'vclan__contrada',
+        'service',
     ]
 
     base_readonly_fields = ['codice_censimento', 'cu',
@@ -629,9 +632,14 @@ class HumenBadgeAdmin(admin.ModelAdmin):
 
     list_display = ('__unicode__', 'humen', 'code', 'is_valid', 'updated_at')
 
+class HumenServicesAdmin(admin.ModelAdmin):
+
+    list_display = ('name',)
+
 admin.site.register(Humen, BaseHumenAdmin)
 admin.site.register(HumenSostituzioni, HumenSostituzioniAdmin)
 admin.site.register(HumenBadge, HumenBadgeAdmin)
+admin.site.register(HumenServices, HumenServicesAdmin)
 #admin.site.register(RSHumen, RSAdmin)
 #admin.site.register(ChiefHumen, ChiefAdmin)
 admin.site.register(Periodipartecipaziones, PeriodipartecipazionesAdmin)

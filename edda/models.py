@@ -72,7 +72,22 @@ class PosixGroup(models.Model):
 #        verbose_name = "corrispondenza persona -> permesso"
 #        verbose_name_plural = "corrispondenze persone -> permessi"
 #
-    
+
+#--------------------------------------------------------------------------------
+
+class HumenServices(models.Model):
+
+    name = models.CharField(primary_key=True, max_length=127)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta():
+        db_table = 'humen_services'
+        ordering = ('name',)
+        verbose_name = 'servizio'
+        verbose_name_plural = 'servizi'
+
 #--------------------------------------------------------------------------------
 
 class Humen(models.Model):
@@ -252,10 +267,16 @@ class Humen(models.Model):
     arrivato_al_quartiere = models.NullBooleanField(default=None)
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
-    posix_group_set = models.ManyToManyField(PosixGroup, 
+    posix_group_set = models.ManyToManyField(PosixGroup,
         null=True, blank=True, related_name="humen_set",
         #through=HumenPosixGroupMap
     )
+
+
+    # Servizi -----------------------------------------
+
+    service = models.ForeignKey(HumenServices, blank=True, null=True, verbose_name='Servizio')
+
 
     class Meta:
         #managed = False
@@ -461,7 +482,7 @@ class Humen(models.Model):
             send_to_rabbitmq(routing_key, data)
 
         logger.info("[UPDATE %s] %s" % (routing_key, data))
-        
+
     def get_posix_groups(self):
         """
         Query the REST API for groups belonging to this humen
@@ -476,7 +497,7 @@ class Humen(models.Model):
             response = urllib2.urlopen(req)
         except urllib2.HTTPError as error:
             contents = error.read()
-        
+
             rv = [u"Errore HTTP nel recupero dei gruppi per %s (%s)" % (self.cu, contents)]
         else:
             contents = response.read()
@@ -485,7 +506,7 @@ class Humen(models.Model):
 
         return rv
 
-        
+
 #---------------------------------------------------------------------------------
 
 class Vclans(models.Model):
@@ -561,15 +582,15 @@ class Vclans(models.Model):
 
 class HumenSostituzioni(models.Model):
 
-    humen = models.ForeignKey(Humen, to_field="cu", 
+    humen = models.ForeignKey(Humen, to_field="cu",
         primary_key=True, db_column="cu", related_name="sostituito_da_set",
         verbose_name="persona"
     )
-    humen_sostituito_da = models.ForeignKey(Humen, to_field="cu", 
+    humen_sostituito_da = models.ForeignKey(Humen, to_field="cu",
         db_column="cu_sostituito_da", related_name="sostituisce_da_set",
         verbose_name="sostituito da",
         null=True
-        
+
     )
     updated_at = models.DateTimeField(
         verbose_name='ultimo aggiornamento', help_text='', auto_now=True
@@ -597,12 +618,12 @@ class HumenSostituzioni(models.Model):
 
 class HumenBadge(models.Model):
 
-    humen = models.ForeignKey(Humen, to_field="cu", 
+    humen = models.ForeignKey(Humen, to_field="cu",
         db_column="cu", related_name="badge_set",
         verbose_name="persona"
     )
 
-    code = models.CharField(max_length=16, unique=True) 
+    code = models.CharField(max_length=16, unique=True)
 
     is_valid = models.BooleanField(default=True, verbose_name='valido')
 
@@ -801,5 +822,3 @@ if settings.RABBITMQ_ENABLE:
             logger.debug("[DB WRITE %s] %s" % (routing_key, data))
         else:
             logger.debug("[NO RABBIT DB WRITE] %s" % data)
-
-
