@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
+from django.utils.timezone import now
 
 
 from edda.models import Vclans, Humen, HumenSostituzioni
@@ -56,6 +57,8 @@ def vclans_do_check_in_quartiere_vclan(request, pk):
 
     vc = get_object_or_404(Vclans, pk=pk)
     vc.arrivato_al_quartiere = True
+    vc.dt_arrivo_quartiere = now()
+    print 'ciaoooooo'
     vc.save()
 
     return HttpResponse("OK")

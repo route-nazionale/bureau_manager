@@ -533,6 +533,7 @@ class Vclans(models.Model):
     dt_verifica_di_arrivo = models.DateTimeField(blank=True, null=True, default=None)
 
     arrivato_al_quartiere = models.NullBooleanField(default=None)
+    dt_arrivo_quartiere = models.DateTimeField(blank=True, null=True, default=None)
 
     route_num = models.IntegerField(db_column='route', null=True)
     #is_ospitante = models.NullBooleanField(default=None)
