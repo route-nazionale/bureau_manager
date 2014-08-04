@@ -12,6 +12,7 @@ import cStringIO as StringIO
 import cgi
 import sys
 import datetime
+import csv
 
 class Command(BaseCommand):
     args = ''
@@ -19,8 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        #hs = Humen.objects.filter(arrivato_al_quartiere=True)
-        hs = Humen.objects.all()
+        hs = Humen.objects.filter(arrivato_al_quartiere=True)
         n_hs = hs.count()
         done = 0
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         con['n_hs'] = n_hs
         
 
-        filename = '/tmp/panic_export_humen_%s%s%s-%s%s.pdf' % (
+        filename = '/tmp/panic_export_humen_%s%s%s-%s%s.csv' % (
             a.year,
             a.month,
             a.day,
@@ -51,10 +51,43 @@ class Command(BaseCommand):
         )
 
         print ''
+        print 'Esportazione file csv...'
+        write_to_text_file(hs, filename)
         print 'esportati %s utenti in %s' % (done, filename) 
 
-        write_pdf('panic_export.html', con, filename)
 
+def write_to_text_file(humen, filename):
+    f = open(filename, 'wb')
+    f.write(",".join(
+            [
+                "Nome", 
+                "Cognome", 
+                "Data nascita", 
+                "Nome Vclan", 
+                "ID Vclan",
+                "Codice Unico",
+                "Quartiere",
+                "Contrada",
+            ]
+        )
+    )
+    f.write("\n")
+    for h in humen:
+        f.write(",".join(
+                [
+                    h.nome.encode('utf-8'), 
+                    h.cognome.encode('utf-8'), 
+                    str(h.data_nascita).encode('utf-8'), 
+                    h.vclan.nome.encode('utf-8'), 
+                    h.vclan.idvclan.encode('utf-8'),
+                    h.cu.encode('utf-8'),
+                    h.vclan.quartiere.name.encode('utf-8'),
+                    str(h.vclan.contrada).encode('utf-8')
+                ]
+            )
+        )
+        f.write("\n")
+    f.close()
 
 def write_pdf(template_src, context_dict, filename):
     template = get_template(template_src)
