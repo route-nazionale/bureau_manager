@@ -53,7 +53,8 @@ def get_crypto_base64_rn2014(message):
 def get_crypto_base64_rn2014(message):
 
     return subprocess.check_output([
-        'edda/do_shitting_crypt.php', message, settings.CRYPTO_KEY, settings.CRYPTO_KEY_IV
+        os.path.join(settings.BASE_DIR, 'edda','do_shitting_crypt.php'), 
+        message, settings.CRYPTO_KEY, settings.CRYPTO_KEY_IV
     ])
 
 
