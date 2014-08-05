@@ -17,6 +17,7 @@
     <th>Quartiere</th>
     <th>Contrada</th>
     <th>Servizio</th>
+    <th>Note</th>
 {% for p in qs %}
   <tr>
     <td>{{ p.nome }} {{ p.cognome }}</td>
@@ -24,6 +25,7 @@
     <td>{{ p.vclan.quartiere }}</td>
     <td>{{ p.vclan.contrada }}</td>
     <td>{{ p.service }}</td>
+    <td>{{ p.note }}</td>
   </tr>
 {% endfor %}
 </table>
