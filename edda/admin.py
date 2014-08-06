@@ -399,7 +399,7 @@ class BaseHumenAdmin(admin.ModelAdmin):
             badge_qs.append(hu.get_new_badge())
         return make_pdf_response({ 'qs' : badge_qs }, 'badge_qs.html')
     stampa_badge.short_description = 'STAMPA BADGE DELLE PERSONE SELEZIONATE'
-    
+
     def stampa_servizi(self, request, queryset):
 
         servizi = []
@@ -436,11 +436,11 @@ class BaseHumenAdmin(admin.ModelAdmin):
 
         obj.save()
 
-    class Media:
-        css = {
-            "all": ("my_styles.css",)
-        }
-        js = ("some_admin_code.js",)
+#    class Media:
+#        css = {
+#            "all": ("my_styles.css",)
+#        }
+#        js = ("some_admin_code.js",)
 
 class HumenAdmin(BaseHumenAdmin):
     list_display = copy.copy(BaseHumenAdmin.list_display) + ['rs', 'capo']
@@ -648,8 +648,8 @@ class HumenServicesAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'n_humen',)
 
-    inlines = [ HumenInline ] 
-    
+    inlines = [ HumenInline ]
+
     def has_delete_permission(self, request, obj=None):
         return False
 
