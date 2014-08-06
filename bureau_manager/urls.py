@@ -32,4 +32,5 @@ urlpatterns = patterns('',
     url(r'api/search-vclan/', 'edda.views.api_search_vclan'),
     url(r'api/set-vclan-arrived/', 'edda.views.api_set_vclan_arrived'),
     url(r'check-in/', 'edda.views.check_in'),
+    url(r'situazione-persone/', 'edda.views.situazione_persone'),
 )
