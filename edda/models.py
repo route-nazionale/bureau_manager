@@ -133,7 +133,7 @@ class Humen(models.Model):
         choices=SESSO_CHOICES
     )
     data_nascita = models.DateField(null=True,
-        verbose_name='data di nascita', help_text=''
+        verbose_name='data di nascita (GG/MM/AAAA)', help_text=''
     )
     eta = models.IntegerField(blank=True, null=True,
         verbose_name=u'età', help_text=''
