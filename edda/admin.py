@@ -305,10 +305,35 @@ class BaseHumenAdmin(admin.ModelAdmin):
         if obj:
             if request.user.is_superuser or obj.ruolo.pk == 8:
                 # vclan can be modified
-                if 'vclan' in self.base_readonly_fields:
-                    self.base_readonly_fields.remove('vclan')
+                more_readonly_fields = []
             else:
-                self.base_readonly_fields.append('vclan')
+                more_readonly_fields = ['vclan']
+
+            if request.user.is_readonly():
+                self.readonly_fields = self.change_readonly_fields + more_readonly_fields + [
+                    'vclan',
+                    'scout', 'agesci',
+                    'cu',
+                    'fisiche', 'lis', 'psichiche', 'sensoriali',
+                    'patologie',
+                    'colazione', 'dieta_alimentare',
+                    'el_intolleranze_alimentari',
+                    'el_allergie_alimentari',
+                    'el_allergie_farmaci',
+                    'stradadicoraggio1', 'stradadicoraggio2',
+                    'stradadicoraggio3', 'stradadicoraggio4',
+                    'stradadicoraggio5',
+                    'ruolo', 'periodo_partecipazione', 'pagato',
+                    'nome', 'cognome', 'sesso', 'data_nascita',
+                    'cellulare', 'email',
+                    'abitazione', 'indirizzo',
+                    'provincia', 'cap', 'citta'
+                ]
+            else:
+                self.readonly_fields = self.change_readonly_fields + more_readonly_fields
+        else:
+            self.readonly_fields = self.add_readonly_fields
+
 
         form = super(BaseHumenAdmin, self).get_form(request, obj)
         if form.base_fields.get('vclan'):
@@ -331,34 +356,72 @@ class BaseHumenAdmin(admin.ModelAdmin):
         if request.user.is_readonly():
             self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
-        for f in self.hyperdynamic_fields:
-            if f not in self.base_readonly_fields:
-                self.base_readonly_fields.append(f)
-                if f not in self.fieldsets[0][1]['fields']:
-                    self.fieldsets[0][1]['fields'].append(f)
+        self.change_readonly_fields = [
+            'codice_censimento', 'cu',
+            'quartiere', 'contrada',
+            'arrivato_al_campo_display', 
+            'arrivato_al_quartiere_display',
+            'sostituito_da',
+            'quartiere',
+            'contrada',
+        ]
 
-        if request.user.is_readonly():
-            self.readonly_fields = self.base_readonly_fields + [
-                'vclan',
-                'scout', 'agesci',
-                'cu',
-                'fisiche', 'lis', 'psichiche', 'sensoriali',
-                'patologie',
-                'colazione', 'dieta_alimentare',
-                'el_intolleranze_alimentari',
-                'el_allergie_alimentari',
-                'el_allergie_farmaci',
-                'stradadicoraggio1', 'stradadicoraggio2',
-                'stradadicoraggio3', 'stradadicoraggio4',
-                'stradadicoraggio5',
-                'ruolo', 'periodo_partecipazione', 'pagato',
-                'nome', 'cognome', 'sesso', 'data_nascita',
-                'cellulare', 'email',
-                'abitazione', 'indirizzo',
-                'provincia', 'cap', 'citta'
-            ]
-        else:
-            self.readonly_fields = self.base_readonly_fields
+        self.fieldsets = (
+            (None, {
+                'fields': [
+                    ('vclan', 'codice_censimento'),
+                    ('scout'),
+                    ('agesci'),
+                    ('classe_presenza'),
+                    ('cu',),
+                    ('service',),
+                    'arrivato_al_campo_display', 
+                    'arrivato_al_quartiere_display',
+                    'sostituito_da',
+                    'quartiere',
+                    'contrada',
+                ],
+                'classes' : ('wide',)
+            }),
+            ('Anagrafica', {
+                'fields': (
+                    ('nome', 'cognome'), ('sesso', 'data_nascita'),
+                    ('cellulare', 'email'),
+                    ('abitazione', 'indirizzo', 'provincia', 'cap', 'citta'),
+                )
+            }),
+            ('Partecipazione', {
+                'fields': (
+                    'ruolo', 'periodo_partecipazione', ('pagato'),
+                )
+            }),
+            ('Strade di coraggio', {
+                'fields': (
+                    ('stradadicoraggio1'),
+                    ('stradadicoraggio2'),
+                    ('stradadicoraggio3'),
+                    ('stradadicoraggio4'),
+                    ('stradadicoraggio5'),
+                )
+            }),
+            ('Alimentazione', {
+                'fields': (
+                    ('colazione', 'dieta_alimentare'),
+                    'el_intolleranze_alimentari',
+                    'el_allergie_alimentari',
+                    'el_allergie_farmaci',
+                )
+            }),
+            ('Diversamente abili', {
+                'fields': (
+                    ('fisiche', 'lis', 'psichiche', 'sensoriali'),
+                    'patologie',
+                ),
+                #'classes' : ('wide',),
+            }),
+            ('Note', {'fields': ('note',)}),
+        )
+
         return super(BaseHumenAdmin, self).change_view(request, *args, **kw)
 
     def add_view(self, request, *args, **kw):
@@ -366,12 +429,56 @@ class BaseHumenAdmin(admin.ModelAdmin):
         if request.user.is_readonly():
             self.message_user(request, "[NOTA] questo utente non può modificare", level=messages.WARNING)
 
-        # Clean an "add form"
-        for f in self.hyperdynamic_fields:
-            if f in self.base_readonly_fields:
-                self.base_readonly_fields.remove(f)
-                if f in self.fieldsets[0][1]['fields']:
-                    self.fieldsets[0][1]['fields'].remove(f)
+        self.fieldsets = (
+            (None, {
+                'fields': [
+                    ('vclan', 'codice_censimento'),
+                    ('scout'),
+                    ('agesci'),
+                    ('classe_presenza'),
+                    ('service',),
+                ],
+                'classes' : ('wide',)
+            }),
+            ('Anagrafica', {
+                'fields': (
+                    ('nome', 'cognome'), ('sesso', 'data_nascita'),
+                    ('cellulare', 'email'),
+                    ('abitazione', 'indirizzo', 'provincia', 'cap', 'citta'),
+                )
+            }),
+            ('Partecipazione', {
+                'fields': (
+                    'ruolo', 'periodo_partecipazione', ('pagato'),
+                )
+            }),
+            ('Strade di coraggio', {
+                'fields': (
+                    ('stradadicoraggio1'),
+                    ('stradadicoraggio2'),
+                    ('stradadicoraggio3'),
+                    ('stradadicoraggio4'),
+                    ('stradadicoraggio5'),
+                )
+            }),
+            ('Alimentazione', {
+                'fields': (
+                    ('colazione', 'dieta_alimentare'),
+                    'el_intolleranze_alimentari',
+                    'el_allergie_alimentari',
+                    'el_allergie_farmaci',
+                )
+            }),
+            ('Diversamente abili', {
+                'fields': (
+                    ('fisiche', 'lis', 'psichiche', 'sensoriali'),
+                    'patologie',
+                ),
+                #'classes' : ('wide',),
+            }),
+            ('Note', {'fields': ('note',)}),
+        )
+        self.add_readonly_fields = []
 
         return super(BaseHumenAdmin, self).add_view(request, *args, **kw)
 
