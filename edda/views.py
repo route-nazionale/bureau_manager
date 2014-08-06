@@ -312,4 +312,42 @@ def update_humen_groups(request, pk):
     return HttpResponse("OK")
     
     
+def situazione_persone(request):
+    n_persone = Humen.objects.filter(arrivato_al_quartiere=True).count()
+    totale = Humen.objects.all().count()
+    n_rimaste = totale - n_persone
+
+    nq1 = Humen.objects.filter(vclan__quartiere__id=1, arrivato_al_quartiere=True).count()
+    nq2 = Humen.objects.filter(vclan__quartiere__id=2, arrivato_al_quartiere=True).count()
+    nq3 = Humen.objects.filter(vclan__quartiere__id=3, arrivato_al_quartiere=True).count()
+    nq4 = Humen.objects.filter(vclan__quartiere__id=4, arrivato_al_quartiere=True).count()
+    nq5 = Humen.objects.filter(vclan__quartiere__id=5, arrivato_al_quartiere=True).count()
+
+    nclan1 = Vclans.objects.filter(quartiere__id=1, arrivato_al_quartiere=True).count()
+    nclan2 = Vclans.objects.filter(quartiere__id=2, arrivato_al_quartiere=True).count()
+    nclan3 = Vclans.objects.filter(quartiere__id=3, arrivato_al_quartiere=True).count()
+    nclan4 = Vclans.objects.filter(quartiere__id=4, arrivato_al_quartiere=True).count()
+    nclan5 = Vclans.objects.filter(quartiere__id=5, arrivato_al_quartiere=True).count()
+
+    noneteam = Humen.objects.filter(ruolo__value='PERSONALE DI SERVIZIO', arrivato_al_quartiere=True).count()
+
+    return render_to_response(
+      'situazione-persone.html',
+      {
+        'npersone': n_persone,
+        'nrimaste': n_rimaste,
+        'totale': totale,
+        'nq1': nq1,
+        'nq2': nq2,
+        'nq3': nq3,
+        'nq4': nq4,
+        'nq5': nq5,
+        'nclan1': nclan1,
+        'nclan2': nclan2,
+        'nclan3': nclan3,
+        'nclan4': nclan4,
+        'nclan5': nclan5,
+        'noneteam': noneteam,
+      }
+    )
 
