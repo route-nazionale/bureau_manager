@@ -331,6 +331,8 @@ def situazione_persone(request):
 
     noneteam = Humen.objects.filter(ruolo__value='PERSONALE DI SERVIZIO', arrivato_al_quartiere=True).count()
 
+    n_clan_varco0 = Vclans.objects.filter(arrivato_al_campo=True).count()
+
     return render_to_response(
       'situazione-persone.html',
       {
@@ -348,6 +350,7 @@ def situazione_persone(request):
         'nclan4': nclan4,
         'nclan5': nclan5,
         'noneteam': noneteam,
+        'n_clan_varco0': n_clan_varco0,
       }
     )
 
