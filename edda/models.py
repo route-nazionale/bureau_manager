@@ -93,7 +93,7 @@ class HumenServices(models.Model):
 
     @property
     def n_humen(self):
-        return self.humen_set.count() 
+        return self.humen_set.count()
 
 #--------------------------------------------------------------------------------
 
@@ -287,7 +287,7 @@ class Humen(models.Model):
 
     # Servizi -----------------------------------------
 
-    service = models.ForeignKey(HumenServices, blank=True, null=True, 
+    service = models.ForeignKey(HumenServices, blank=True, null=True,
         verbose_name='servizio'
     )
 
@@ -301,6 +301,7 @@ class Humen(models.Model):
     def __unicode__(self):
         return u"%s - %s %s" % (self.cu, self.nome, self.cognome)
 
+    @transaction.atomic
     def save(self, *args, **kw):
 
         # Set boolean fields
