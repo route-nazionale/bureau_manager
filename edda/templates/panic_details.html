@@ -10,10 +10,10 @@
     padding: 2px;
   }
 </style>
-<h1>QUARTIERE A</h1>
+<h1>QUARTIERE {{ quartiere_id }}</h1>
 <h1>ELENCO PRESENTI CLAN {{clan.nome}} - {{clan.idvclan}}</h1>
 <ul>
   {% for h in hs %}
-    <li>{{ h.nome }} {{ h.cognome }} - nato il:{{ h.data_nascita }}</li> 
+    <li>{{ h.nome }} {{ h.cognome }} - nato il {{ h.data_nascita }}</li> 
   {% endfor %}
 </ul>
