@@ -1,0 +1,26 @@
+<style>
+  @page {
+    size: a4 portrait;
+    margin: 40px;
+    border: 0px solid white;
+    font-size: 13px;
+  }
+  td {
+    border: 1px solid black;
+    padding: 2px;
+  }
+</style>
+<h1>Lista dei clan presenti al quartiere A</h1>
+<table>
+  <tr>
+    <th>ID Clan</th>
+    <th>Nome</th>
+    <th>N. Persone</th>
+{% for c in clans %}
+  <tr>
+    <td>{{ c.idvclan }}</td>
+    <td>{{ c.nome }}</td>
+    <td>{{ c.npersone }}</td>
+  </tr>
+{% endfor %}
+</table>
