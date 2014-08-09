@@ -448,7 +448,7 @@ class Humen(models.Model):
           badge_qs.update(is_valid=False)
           nums = []
           for badge in badge_qs:
-              nums.append(badge.code[15])
+              nums.append(badge.code[-1])
           max_num = max(nums)
           if max_num == '9':
               new_num = 'A'
@@ -653,7 +653,7 @@ class HumenBadge(models.Model):
         verbose_name_plural = 'badge'
 
     def __unicode__(self):
-        return u"%s - %s" % (self.humen, self.code[15:])
+        return self.code
 
     @property
     def qrcode(self):
