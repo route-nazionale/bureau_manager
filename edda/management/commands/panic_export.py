@@ -11,8 +11,6 @@ from xhtml2pdf import pisa
 import cStringIO as StringIO
 import cgi
 import sys
-import datetime
-import csv
 
 class Command(BaseCommand):
     args = ''
@@ -20,74 +18,45 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        hs = Humen.objects.filter(arrivato_al_quartiere=True)
-        n_hs = hs.count()
-        done = 0
+        for quartiere_id in range(1, 6):
 
-        con = {}
-        con['hs'] = []
+            clans = Vclans.objects.filter(quartiere__id=quartiere_id, arrivato_al_quartiere=True)
 
-        for h in hs:
+            n_clans = clans.count()
+            done = 0
 
-            done = done + 1
+            con = {}
+            con['quartiere_id'] = quartiere_id
+            con['clans'] = []
 
-            sys.stdout.write("\r%s/%s %s %s%%" % (done, n_hs, h.cu, int(100 * float(done)/float(n_hs))))
-            sys.stdout.flush()
+            # genera una pagina riassuntiva per ogni clan
+            for c in clans:
 
-            con['hs'].append(h)
-        
-        a = datetime.datetime.now()
+                npersone = Humen.objects.filter(vclan=c, arrivato_al_quartiere=True).count()
 
-        con['data'] = a
-        con['n_hs'] = n_hs
-        
+                con['clans'].append({'nome': c.nome, 'idvclan': c.idvclan, 'npersone': npersone})
 
-        filename = '/tmp/panic_export_humen_%s%s%s-%s%s.csv' % (
-            a.year,
-            a.month,
-            a.day,
-            a.hour,
-            a.minute,
-        )
+            write_pdf('panic_overview.html', con, 'panic_export/sottocampo%s_riassunto_clan.pdf' % (quartiere_id))
 
-        print ''
-        print 'Esportazione file csv...'
-        write_to_text_file(hs, filename)
-        print 'esportati %s utenti in %s' % (done, filename) 
+            # genera una pagina dettagliata per ogni clan
+            for c in clans:
 
+                con = {}
+                con['quartiere_id'] = quartiere_id
+                con['clan'] = {'nome': c.nome, 'idvclan': c.idvclan}
+                con['hs'] = []
 
-def write_to_text_file(humen, filename):
-    f = open(filename, 'wb')
-    f.write(",".join(
-            [
-                "Nome", 
-                "Cognome", 
-                "Data nascita", 
-                "Nome Vclan", 
-                "ID Vclan",
-                "Codice Unico",
-                "Quartiere",
-                "Contrada",
-            ]
-        )
-    )
-    f.write("\n")
-    for h in humen:
-        f.write(",".join(
-                [
-                    h.nome.encode('utf-8'), 
-                    h.cognome.encode('utf-8'), 
-                    str(h.data_nascita).encode('utf-8'), 
-                    h.vclan.nome.encode('utf-8'), 
-                    h.vclan.idvclan.encode('utf-8'),
-                    h.cu.encode('utf-8'),
-                    h.vclan.quartiere.name.encode('utf-8'),
-                    str(h.vclan.contrada).encode('utf-8')
-                ]
-            )
-        )
-        f.write("\n")
-    f.close()
+                hs = Humen.objects.filter(vclan=c, arrivato_al_quartiere=True)
+
+                for h in hs:
+                    con['hs'].append(h)
+
+                write_pdf('panic_details.html', con, 'panic_tmp/sottocampo%s_dettagli_clan_%s.pdf' % (quartiere_id, c.idvclan))
+
+            print('Quartiere %s OK!' % (quartiere_id))
+
+        print('>>> Mission Complete!! <<<')
+
 
 def write_pdf(template_src, context_dict, filename):
     template = get_template(template_src)
@@ -98,5 +67,3 @@ def write_pdf(template_src, context_dict, filename):
         html.encode("UTF-8")), result)
     result.close()
 
-
-          

@@ -1,4 +1,5 @@
 *.swp
+panic_export/*.pdf
 
 
 # Byte-compiled / optimized / DLL files
